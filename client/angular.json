@@ -1,0 +1,107 @@
+{
+  "$schema": "./node_modules/@angular/cli/lib/config/schema.json",
+  "version": 1,
+  "newProjectRoot": "projects",
+  "projects": {
+    "HeroWebScanner": {
+      "projectType": "application",
+      "schematics": {
+        "@schematics/angular:component": {
+          "style": "scss"
+        }
+      },
+      "root": "projects/hero-web-scanner",
+      "sourceRoot": "projects/hero-web-scanner/src",
+      "prefix": "app",
+      "architect": {
+        "build": {
+          "builder": "@angular-devkit/build-angular:browser",
+          "options": {
+            "outputPath": "dist/hero-web-scanner",
+            "index": "projects/hero-web-scanner/src/index.html",
+            "main": "projects/hero-web-scanner/src/main.ts",
+            "polyfills": "projects/hero-web-scanner/src/polyfills.ts",
+            "tsConfig": "projects/hero-web-scanner/tsconfig.app.json",
+            "inlineStyleLanguage": "scss",
+            "assets": [
+              "projects/hero-web-scanner/src/favicon.ico",
+              "projects/hero-web-scanner/src/assets"
+            ],
+            "styles": [
+              "projects/hero-web-scanner/src/styles.scss"
+            ],
+            "scripts": []
+          },
+          "configurations": {
+            "production": {
+              "budgets": [
+                {
+                  "type": "initial",
+                  "maximumWarning": "500kb",
+                  "maximumError": "1mb"
+                },
+                {
+                  "type": "anyComponentStyle",
+                  "maximumWarning": "2kb",
+                  "maximumError": "4kb"
+                }
+              ],
+              "fileReplacements": [
+                {
+                  "replace": "projects/hero-web-scanner/src/environments/environment.ts",
+                  "with": "projects/hero-web-scanner/src/environments/environment.prod.ts"
+                }
+              ],
+              "outputHashing": "all"
+            },
+            "development": {
+              "buildOptimizer": false,
+              "optimization": false,
+              "vendorChunk": true,
+              "extractLicenses": false,
+              "sourceMap": true,
+              "namedChunks": true
+            }
+          },
+          "defaultConfiguration": "production"
+        },
+        "serve": {
+          "builder": "@angular-devkit/build-angular:dev-server",
+          "configurations": {
+            "production": {
+              "browserTarget": "HeroWebScanner:build:production"
+            },
+            "development": {
+              "browserTarget": "HeroWebScanner:build:development"
+            }
+          },
+          "defaultConfiguration": "development"
+        },
+        "extract-i18n": {
+          "builder": "@angular-devkit/build-angular:extract-i18n",
+          "options": {
+            "browserTarget": "HeroWebScanner:build"
+          }
+        },
+        "test": {
+          "builder": "@angular-devkit/build-angular:karma",
+          "options": {
+            "main": "projects/hero-web-scanner/src/test.ts",
+            "polyfills": "projects/hero-web-scanner/src/polyfills.ts",
+            "tsConfig": "projects/hero-web-scanner/tsconfig.spec.json",
+            "karmaConfig": "projects/hero-web-scanner/karma.conf.js",
+            "inlineStyleLanguage": "scss",
+            "assets": [
+              "projects/hero-web-scanner/src/favicon.ico",
+              "projects/hero-web-scanner/src/assets"
+            ],
+            "styles": [
+              "projects/hero-web-scanner/src/styles.scss"
+            ],
+            "scripts": []
+          }
+        }
+      }
+    }
+  }
+}
