@@ -1,6 +1,7 @@
 package websocket
 
 import (
+	"bytes"
 	"encoding/json"
 	"log"
 	"time"
@@ -43,15 +44,10 @@ type Client struct {
 	conn *websocket.Conn
 
 	// Buffered channel of outbound messages.
-	send chan []byte
+	send chan string
 }
 
-// readPump pumps messages from the websocket connection to the hub.
-//
-// The application runs readPump in a per-connection goroutine. The application
-// ensures that there is at most one reader on a connection by executing all
-// reads from this goroutine.
-func (c *Client) readPump() {
+func (c *Client) recorderReadPump() {
 	defer func() {
 		log.Println("Client unregistered: ", c.clientID)
 		c.hub.unregister <- c
@@ -83,8 +79,11 @@ func (c *Client) readPump() {
 		switch messageEnvelope.MessageType {
 		case "rates":
 			//unmarshall rates message
+		case "call_end":
+			log.Printf("Call end message: %v", string(message))
 		default:
-			log.Printf("MESSAGE %s: %v", messageEnvelope.MessageType, string(message))
+			// log.Println("Got message from trunk-recorder")
+			// log.Printf("MESSAGE %s", messageEnvelope.MessageType, string(message))
 		}
 
 		// var messageJSON Message
@@ -95,16 +94,46 @@ func (c *Client) readPump() {
 		// 	continue
 		// }
 
-		//c.hub.broadcast <- message
+		c.hub.broadcast <- string(message)
 	}
 }
 
-// writePump pumps messages from the hub to the websocket connection.
+// readPump pumps messages from the websocket connection to the hub.
 //
-// A goroutine running writePump is started for each connection. The
+// The application runs readPump in a per-connection goroutine. The application
+// ensures that there is at most one reader on a connection by executing all
+// reads from this goroutine.
+func (c *Client) clientReadPump() {
+	defer func() {
+		log.Println("Client unregistered: ", c.clientID)
+		c.hub.unregister <- c
+		c.conn.Close()
+	}()
+	c.conn.SetReadLimit(maxMessageSize)
+	c.conn.SetReadDeadline(time.Now().Add(pongWait))
+	c.conn.SetPongHandler(func(string) error { c.conn.SetReadDeadline(time.Now().Add(pongWait)); return nil })
+	c.conn.SetPingHandler(func(string) error { return nil })
+
+	for {
+		_, message, err := c.conn.ReadMessage()
+		if err != nil {
+			if websocket.IsUnexpectedCloseError(err, websocket.CloseGoingAway, websocket.CloseAbnormalClosure) {
+				log.Printf("error: %v", err)
+			}
+			break
+		}
+
+		log.Printf("MESSAGE from %s: %v", c.clientID, string(message))
+
+	}
+}
+
+// clientWritePump pumps messages from the hub to the websocket connection.
+//
+// A goroutine running clientWritePump is started for each connection. The
 // application ensures that there is at most one writer to a connection by
 // executing all writes from this goroutine.
-func (c *Client) writePump() {
+func (c *Client) clientWritePump() {
 	ticker := time.NewTicker(pingPeriod)
 	defer func() {
 		ticker.Stop()
@@ -126,13 +155,13 @@ func (c *Client) writePump() {
 			}
 
 			// // messageBytes, err := json.Marshal(message)
-			// messageBytes := bytes.NewBufferString(message)
+			messageBytes := bytes.NewBufferString(message).Bytes()
 
 			// if err != nil {
 			// 	log.Printf("Could not marshall message: %v", err)
 			// }
 
-			w.Write(message)
+			w.Write(messageBytes)
 
 			if err := w.Close(); err != nil {
 				return

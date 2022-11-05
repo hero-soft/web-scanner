@@ -13,34 +13,28 @@ type Hub struct {
 	// Registered clients.
 	clients map[*Client]bool
 
-	// Inbound messages from the clients.
-	// broadcast chan Message
+	recorder *Client
+
+	// Messages going to all clients
+	broadcast chan string
 
 	// Register requests from the clients.
 	register chan *Client
-
-	joinGame chan JoinInfo
 
 	// Unregister requests from clients.
 	unregister chan *Client
 }
 
-type JoinInfo struct {
-	GameID string
-	Client *Client
-}
-
-func newHub() *Hub {
+func NewHub() *Hub {
 	return &Hub{
-		// broadcast:  make(chan Message),
-		register:   make(chan *Client),
-		joinGame:   make(chan JoinInfo),
-		unregister: make(chan *Client),
+		broadcast:  make(chan string, 256),
+		register:   make(chan *Client, 256),
+		unregister: make(chan *Client, 256),
 		clients:    make(map[*Client]bool),
 	}
 }
 
-func (h *Hub) run() {
+func (h *Hub) Run() {
 	for {
 		select {
 		case client := <-h.register:
@@ -56,26 +50,26 @@ func (h *Hub) run() {
 				delete(h.clients, client)
 				close(client.send)
 			}
-			// case message := <-h.broadcast:
-			// 	//log.Printf("Broadcasting Message: %+v", message)
-			// 	for client := range h.clients {
-			// 		//fmt.Printf("Client Game ID: %v\n", client.gameID)
-			// 		//fmt.Printf("Message Game ID: %v\n", message.GameID)
-			// 		if message.GameID == client.gameID {
-			// 			select {
-			// 			case client.send <- message:
-			// 			default:
-			// 				close(client.send)
-			// 				delete(h.clients, client)
-			// 			}
-			// 		}
-			// 	}
+		case message := <-h.broadcast:
+			//log.Printf("Broadcasting Message: %+v", message)
+			for client := range h.clients {
+				//fmt.Printf("Client Game ID: %v\n", client.gameID)
+				//fmt.Printf("Message Game ID: %v\n", message.GameID)
+
+				select {
+				case client.send <- message:
+				default:
+					close(client.send)
+					delete(h.clients, client)
+				}
+
+			}
 		}
 	}
 }
 
 // serveWs handles websocket requests from the peer.
-func ServeWsClient(hub *Hub, w http.ResponseWriter, r *http.Request) {
+func (hub *Hub) ServeWsClient(w http.ResponseWriter, r *http.Request) {
 
 	// if !localSettings.Production {
 	upgrader.CheckOrigin = func(r *http.Request) bool {
@@ -89,17 +83,14 @@ func ServeWsClient(hub *Hub, w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// _, m, _ := conn.ReadMessage()
-	// log.Println(string(m))
-
-	client := &Client{hub: hub, conn: conn, send: make(chan []byte, 256)}
+	client := &Client{hub: hub, conn: conn, send: make(chan string, 256)}
 	client.hub.register <- client
 
-	go client.writePump()
-	go client.readPump()
+	go client.clientWritePump()
+	go client.clientReadPump()
 }
 
-func ServeWsServer(hub *Hub, w http.ResponseWriter, r *http.Request) {
+func (hub *Hub) ServeWsRecorder(w http.ResponseWriter, r *http.Request) {
 
 	// if !localSettings.Production {
 	upgrader.CheckOrigin = func(r *http.Request) bool {
@@ -116,9 +107,8 @@ func ServeWsServer(hub *Hub, w http.ResponseWriter, r *http.Request) {
 	// _, m, _ := conn.ReadMessage()
 	// log.Println(string(m))
 
-	client := &Client{hub: hub, conn: conn, send: make(chan []byte, 256)}
-	client.hub.register <- client
+	client := &Client{hub: hub, conn: conn}
+	hub.recorder = client
 
-	go client.writePump()
-	go client.readPump()
+	go client.recorderReadPump()
 }

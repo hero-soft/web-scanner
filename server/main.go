@@ -12,6 +12,7 @@ import (
 
 	"github.com/hero-soft/web-scanner/pkg/httpservice"
 	"github.com/hero-soft/web-scanner/pkg/settings"
+	"github.com/hero-soft/web-scanner/pkg/websocket"
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/spf13/viper"
 	"go.uber.org/zap"
@@ -96,8 +97,11 @@ func (app *application) run(ctx context.Context) error {
 
 		app.logger.Infof("Starting HTTP server on :%s", app.serviceHTTPPort)
 
-		certService := httpservice.NewResponderService(app.baseURL, app.permissiveHeaders, app.logger, app.counters)
-		router := certService.NewRouter()
+		hub := websocket.NewHub()
+		go hub.Run()
+
+		httpService := httpservice.NewResponderService(app.baseURL, app.permissiveHeaders, app.logger, app.counters)
+		router := httpService.NewRouter(hub)
 
 		httpServer, httpErrorChan := app.startHTTPServer(app.serviceHTTPPort, router)
 

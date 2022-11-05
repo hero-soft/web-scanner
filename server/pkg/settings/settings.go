@@ -1,37 +1,28 @@
 package settings
 
 import (
-	"github.com/spf13/pflag"
+	"fmt"
+
 	"github.com/spf13/viper"
 )
 
 func New() (*viper.Viper, error) {
 
-	// pflag.String("service_http_port", "7102", "HTTP Service Port")
-	// pflag.String("baseURL", "lpadmin-dev.tjx.com/api/config", "URL at which the service can be accessed")
-	// pflag.Bool("permissive_headers", true, "Enable debug mode")
+	viper.SetDefault("service_http_port", "8080")
+	viper.SetDefault("metrics_port", "9090")
+	viper.SetDefault("permissive_headers", true)
+	// viper.SetDefault("LayoutDir", "layouts")
+	// viper.SetDefault("Taxonomies", map[string]string{"tag": "tags", "category": "categories"})
 
-	// pflag.Parse()
-	viper.BindPFlags(pflag.CommandLine)
-	viper.BindEnv("METRICS_PORT")
-	viper.BindEnv("SERVICE_HTTP_PORT")
-	viper.BindEnv("SERVICE_GRPC_PORT")
-	viper.BindEnv("PERMISSIVE_HEADERS")
-	viper.BindEnv("BASE_URL")
-	viper.BindEnv("DB_SERVICE")
-	viper.BindEnv("KEYCLOAK_URL")
-	viper.BindEnv("KEYCLOAK_REALM")
-
-	viper.BindEnv("MONGO_HOST")
-	viper.BindEnv("MONGO_DATABASE")
-	viper.BindEnv("MONGO_USER")
-	viper.BindEnv("MONGO_PASSWORD")
-	viper.BindEnv("MONGO_CERT")
-
-	viper.BindEnv("SPACES_ENDPOINT")
-	viper.BindEnv("SPACES_KEY")
-	viper.BindEnv("SPACES_SECRET")
-	viper.BindEnv("SPACES_SPACE")
+	viper.SetConfigName("settings")           // name of config file (without extension)
+	viper.SetConfigType("toml")               // REQUIRED if the config file does not have the extension in the name
+	viper.AddConfigPath("/etc/web-scanner/")  // path to look for the config file in
+	viper.AddConfigPath("$HOME/.web-scanner") // call multiple times to add many search paths
+	viper.AddConfigPath(".")                  // optionally look for config in the working directory
+	err := viper.ReadInConfig()               // Find and read the config file
+	if err != nil {                           // Handle errors reading the config file
+		panic(fmt.Errorf("fatal error config file: %w", err))
+	}
 
 	// viper.SetConfigFile(".env")
 

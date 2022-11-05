@@ -29,8 +29,20 @@ func (h *HttpService) NewRouter(hub *websocket.Hub) *mux.Router {
 		Handler(http.HandlerFunc(h.index))
 	router.
 		Methods("GET", "OPTIONS").
-		Path("/ws/client")
-		// Handler(http.HandlerFunc())
+		Path("/ws/client").
+		Handler(http.HandlerFunc(hub.ServeWsClient))
+	router.
+		Methods("GET", "OPTIONS").
+		Path("/ws/recorder").
+		Handler(http.HandlerFunc(hub.ServeWsRecorder))
+	router.
+		// Methods("GET", "POST", "OPTIONS").
+		Path("/upload/MSP/upload").
+		Handler(http.HandlerFunc(h.test))
+	router.
+		Methods("GET", "OPTIONS").
+		PathPrefix("/audio/").
+		Handler(http.StripPrefix("/audio/", http.FileServer(http.Dir("./audio"))))
 
 	// router.
 	// 	Methods("POST", "OPTIONS").
