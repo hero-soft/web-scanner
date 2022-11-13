@@ -1,10 +1,11 @@
 package websocket
 
 import (
-	"log"
 	"net/http"
 
+	"github.com/hero-soft/web-scanner/pkg/call"
 	uuid "github.com/satori/go.uuid"
+	"go.uber.org/zap"
 )
 
 // hub maintains the set of active clients and broadcasts messages to the
@@ -15,8 +16,12 @@ type Hub struct {
 
 	recorder *Client
 
+	logger *zap.SugaredLogger
+
 	// Messages going to all clients
-	broadcast chan string
+	broadcast chan Message
+
+	Send chan SendTo
 
 	// Register requests from the clients.
 	register chan *Client
@@ -25,9 +30,22 @@ type Hub struct {
 	unregister chan *Client
 }
 
-func NewHub() *Hub {
+type SendTo struct {
+	To      string  `json:"to"`
+	Message Message `json:"message"`
+}
+
+type Message struct {
+	Type  string      `json:"type,omitempty"`
+	Call  call.Call   `json:"call,omitempty"`
+	Calls []call.Call `json:"calls"`
+}
+
+func NewHub(logger *zap.SugaredLogger) *Hub {
 	return &Hub{
-		broadcast:  make(chan string, 256),
+		logger:     logger,
+		broadcast:  make(chan Message, 256),
+		Send:       make(chan SendTo, 256),
 		register:   make(chan *Client, 256),
 		unregister: make(chan *Client, 256),
 		clients:    make(map[*Client]bool),
@@ -43,7 +61,7 @@ func (h *Hub) Run() {
 			uuid := uuid.NewV4()
 			client.clientID = uuid.String()
 
-			log.Println("Client registered: ", client.clientID)
+			h.logger.Infof("Client registered: ", client.clientID)
 
 		case client := <-h.unregister:
 			if _, ok := h.clients[client]; ok {
@@ -51,19 +69,19 @@ func (h *Hub) Run() {
 				close(client.send)
 			}
 		case message := <-h.broadcast:
-			//log.Printf("Broadcasting Message: %+v", message)
 			for client := range h.clients {
-				//fmt.Printf("Client Game ID: %v\n", client.gameID)
-				//fmt.Printf("Message Game ID: %v\n", message.GameID)
 
 				select {
 				case client.send <- message:
+
 				default:
 					close(client.send)
 					delete(h.clients, client)
 				}
 
 			}
+		case sendTo := <-h.Send:
+			h.broadcast <- sendTo.Message
 		}
 	}
 }
@@ -79,11 +97,11 @@ func (hub *Hub) ServeWsClient(w http.ResponseWriter, r *http.Request) {
 
 	conn, err := upgrader.Upgrade(w, r, nil)
 	if err != nil {
-		log.Println(err)
+		hub.logger.Error(err)
 		return
 	}
 
-	client := &Client{hub: hub, conn: conn, send: make(chan string, 256)}
+	client := &Client{logger: hub.logger, hub: hub, conn: conn, send: make(chan Message, 256)}
 	client.hub.register <- client
 
 	go client.clientWritePump()
@@ -100,14 +118,11 @@ func (hub *Hub) ServeWsRecorder(w http.ResponseWriter, r *http.Request) {
 
 	conn, err := upgrader.Upgrade(w, r, nil)
 	if err != nil {
-		log.Println(err)
+		hub.logger.Error(err)
 		return
 	}
 
-	// _, m, _ := conn.ReadMessage()
-	// log.Println(string(m))
-
-	client := &Client{hub: hub, conn: conn}
+	client := &Client{logger: hub.logger, hub: hub, conn: conn}
 	hub.recorder = client
 
 	go client.recorderReadPump()

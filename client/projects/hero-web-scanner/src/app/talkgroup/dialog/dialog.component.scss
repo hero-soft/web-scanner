@@ -1,0 +1,13 @@
+.buttons {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  padding: 10px;
+
+  gap: 10px;
+
+  button {
+    height: 100px;
+    width: 100px;
+  }
+}

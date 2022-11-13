@@ -1,0 +1,132 @@
+.page {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+
+  .nowPlaying {
+    display: flex;
+    flex-direction: column;
+
+    border: 1px solid black;
+    border-radius: 5px;
+
+    margin: 20px;
+    margin-bottom: 0px;
+
+    padding: 20px;
+    gap: 10px;
+
+    .display {
+      height: 100px;
+      width: 500px;
+      max-width: 100%;
+
+      padding: 10px;
+
+      border: 1px solid black;
+      border-radius: 5px;
+
+      background-color: aquamarine;
+
+      display: flex;
+      flex-direction: column;
+
+      gap: 10px;
+
+      .line1 {
+        font-size: 20px;
+        font-weight: 500;
+        color: black;
+
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+      .line2 {}
+      .line3 {
+        display: flex;
+        flex-direction: row;
+        justify-content: space-between;
+      }
+
+    }
+
+    .actions {
+      display: flex;
+      flex-direction: row;
+      gap: 10px;
+    }
+  }
+
+  .content {
+    display: flex;
+    flex-direction: row;
+
+    @media only screen and (max-width: 600px) {
+      flex-direction: column;
+    }
+
+    gap: 10px;
+
+    margin: 20px;
+    margin-bottom: 10px;
+
+    flex: 1;
+
+    > div {
+      flex: 1;
+      border: 1px solid #000;
+      padding: 10px;
+
+      margin-bottom: 20px;
+
+      .call-list {
+        display: flex;
+        flex-direction: column;
+
+        gap: 10px;
+        text-overflow: ellipsis;
+
+        @media only screen and (max-width: 600px) {
+          height: 200px;
+          overflow-x: scroll;
+        }
+
+
+        app-call {
+          flex: 1;
+        }
+      }
+    }
+  }
+}
+
+mat-toolbar {
+  background-color: #000;
+  color: #fff;
+
+  padding: 10px 20px;
+
+  gap: 10px;
+}
+
+.spacer {
+  flex: 1 1 auto;
+}
+
+mat-drawer {
+  width: 600px;
+  max-width: 96%;
+  padding: 20px;
+  background-color: white;
+
+  border-left: 3px solid black;
+}
+
+mat-drawer-container {
+  height: 100%;
+  ::ng-deep mat-drawer-content {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+  }
+}

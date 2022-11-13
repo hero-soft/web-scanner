@@ -1,0 +1,32 @@
+.buttons {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  padding: 10px;
+
+  gap: 10px;
+
+  button {
+    height: 100px;
+    width: 100px;
+
+    flex-grow: 1;
+
+    display: flex;
+    align-items: center;
+    padding: 5px;
+
+    .text {
+      overflow-wrap: normal;
+    }
+
+    .light {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      width: 8px;
+      height: 8px;
+      background-color: #f50909;
+    }
+  }
+}

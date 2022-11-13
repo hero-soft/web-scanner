@@ -11,6 +11,8 @@ func New() (*viper.Viper, error) {
 	viper.SetDefault("service_http_port", "8080")
 	viper.SetDefault("metrics_port", "9090")
 	viper.SetDefault("permissive_headers", true)
+	viper.SetDefault("talkgroups_file", "")
+	viper.SetDefault("console_logs", false)
 	// viper.SetDefault("LayoutDir", "layouts")
 	// viper.SetDefault("Taxonomies", map[string]string{"tag": "tags", "category": "categories"})
 

@@ -1,13 +1,15 @@
 package websocket
 
 import (
-	"bytes"
 	"encoding/json"
-	"log"
+	"fmt"
 	"time"
 
 	"github.com/gorilla/websocket"
+	"github.com/hero-soft/web-scanner/pkg/call"
+	"github.com/hero-soft/web-scanner/pkg/talkgroup"
 	trunkrecorder "github.com/hero-soft/web-scanner/pkg/trunk-recorder"
+	"go.uber.org/zap"
 )
 
 const (
@@ -38,41 +40,43 @@ var upgrader = websocket.Upgrader{
 type Client struct {
 	hub *Hub
 
+	logger *zap.SugaredLogger
+
 	clientID string
 
 	// The websocket connection.
 	conn *websocket.Conn
 
 	// Buffered channel of outbound messages.
-	send chan string
+	send chan Message
 }
 
 func (c *Client) recorderReadPump() {
 	defer func() {
-		log.Println("Client unregistered: ", c.clientID)
+		c.logger.Infof("Client unregistered: ", c.clientID)
 		c.hub.unregister <- c
 		c.conn.Close()
 	}()
 	c.conn.SetReadLimit(maxMessageSize)
-	c.conn.SetReadDeadline(time.Now().Add(pongWait))
+	//c.conn.SetReadDeadline(time.Now().Add(pongWait))
 	c.conn.SetPongHandler(func(string) error { c.conn.SetReadDeadline(time.Now().Add(pongWait)); return nil })
 	c.conn.SetPingHandler(func(string) error { return nil })
 
 	for {
-		_, message, err := c.conn.ReadMessage()
+		_, m, err := c.conn.ReadMessage()
 		if err != nil {
 			if websocket.IsUnexpectedCloseError(err, websocket.CloseGoingAway, websocket.CloseAbnormalClosure) {
-				log.Printf("error: %v", err)
+				c.logger.Errorf("%v", err)
 			}
 			break
 		}
 
 		//unmarshall message envelope
 		var messageEnvelope trunkrecorder.MessageEnvelope
-		err = json.Unmarshal(message, &messageEnvelope)
+		err = json.Unmarshal(m, &messageEnvelope)
 
 		if err != nil {
-			log.Println("Error unmarshalling message envelope: ", err)
+			c.logger.Errorf("Error unmarshalling message envelope: ", err)
 			break
 		}
 
@@ -80,7 +84,49 @@ func (c *Client) recorderReadPump() {
 		case "rates":
 			//unmarshall rates message
 		case "call_end":
-			log.Printf("Call end message: %v", string(message))
+			c.logger.Infof("Call end message: %v", string(m))
+		case "calls_active":
+			messageDetail := trunkrecorder.CallsActive{}
+
+			err := json.Unmarshal(m, &messageDetail)
+
+			if err != nil {
+
+				outMessage := Message{
+					Type:  "calls_active",
+					Calls: []call.Call{},
+				}
+
+				c.hub.broadcast <- outMessage
+
+				break
+			}
+
+			outMessage := Message{
+				Type:  "calls_active",
+				Calls: []call.Call{},
+			}
+
+			for _, iCall := range messageDetail.Calls {
+				tg, err := talkgroup.Lookup(iCall.Talkgroup, iCall.TalkgroupTag)
+
+				if err != nil {
+					fmt.Println("Error looking up talkgroup", err)
+					return
+				}
+
+				outMessage.Calls = append(outMessage.Calls, call.Call{
+					Talkgroup: talkgroup.Talkgroup{
+						ID:          tg.ID,
+						Name:        tg.Name,
+						Description: tg.Description,
+					},
+					// Emergency:     iCall.Emergency,
+				})
+			}
+
+			c.hub.broadcast <- outMessage
+
 		default:
 			// log.Println("Got message from trunk-recorder")
 			// log.Printf("MESSAGE %s", messageEnvelope.MessageType, string(message))
@@ -94,7 +140,6 @@ func (c *Client) recorderReadPump() {
 		// 	continue
 		// }
 
-		c.hub.broadcast <- string(message)
 	}
 }
 
@@ -105,7 +150,7 @@ func (c *Client) recorderReadPump() {
 // reads from this goroutine.
 func (c *Client) clientReadPump() {
 	defer func() {
-		log.Println("Client unregistered: ", c.clientID)
+		c.logger.Infof("Client unregistered: ", c.clientID)
 		c.hub.unregister <- c
 		c.conn.Close()
 	}()
@@ -115,15 +160,15 @@ func (c *Client) clientReadPump() {
 	c.conn.SetPingHandler(func(string) error { return nil })
 
 	for {
-		_, message, err := c.conn.ReadMessage()
+		_, m, err := c.conn.ReadMessage()
 		if err != nil {
 			if websocket.IsUnexpectedCloseError(err, websocket.CloseGoingAway, websocket.CloseAbnormalClosure) {
-				log.Printf("error: %v", err)
+				c.logger.Errorf("%v", err)
 			}
 			break
 		}
 
-		log.Printf("MESSAGE from %s: %v", c.clientID, string(message))
+		c.logger.Infof("MESSAGE from %s: %v", c.clientID, string(m))
 
 	}
 }
@@ -141,7 +186,7 @@ func (c *Client) clientWritePump() {
 	}()
 	for {
 		select {
-		case message, ok := <-c.send:
+		case m, ok := <-c.send:
 			c.conn.SetWriteDeadline(time.Now().Add(writeWait))
 			if !ok {
 				// The hub closed the channel.
@@ -154,12 +199,11 @@ func (c *Client) clientWritePump() {
 				return
 			}
 
-			// // messageBytes, err := json.Marshal(message)
-			messageBytes := bytes.NewBufferString(message).Bytes()
+			messageBytes, err := json.Marshal(m)
 
-			// if err != nil {
-			// 	log.Printf("Could not marshall message: %v", err)
-			// }
+			if err != nil {
+				c.logger.Errorf("Could not marshall message: %v", err)
+			}
 
 			w.Write(messageBytes)
 

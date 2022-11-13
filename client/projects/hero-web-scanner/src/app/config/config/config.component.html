@@ -1,0 +1,19 @@
+<h3>Settings</h3>
+
+<section class="config">
+  <h4>Server</h4>
+  <mat-form-field class="example-form-field" appearance="fill">
+    <mat-label>Host</mat-label>
+    <input matInput type="text" [(ngModel)]="config.server.host">
+    <button *ngIf="config.server.host" matSuffix mat-icon-button aria-label="Clear" (click)="config.server.host=''">
+      <mat-icon>close</mat-icon>
+    </button>
+  </mat-form-field>
+
+  <mat-checkbox class="example-margin">Check me!</mat-checkbox>
+
+  <h4>Talkgroups</h4>
+  <button mat-raised-button color="primary" (click)="openDialog()">Select Talkgroups</button>
+</section>
+
+

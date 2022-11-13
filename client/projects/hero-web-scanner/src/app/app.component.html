@@ -1,15 +1,87 @@
 
-<audio controls autoplay>
-  <source src="http://localhost:8080/audio/33168-1667417585_854412500-call_152.m4a" type="audio/mp4" au>
-Your browser does not support the audio element.
-</audio>
+<div class="page">
+  <mat-toolbar>
+    <span>Hero Web Scanner</span>
+    <span class="spacer"></span>
+    <button mat-icon-button class="example-icon favorite-icon" aria-label="Example icon-button with heart icon" (click)="enableClick()">
+      <mat-icon *ngIf="enabled">volume_up</mat-icon>
+      <mat-icon *ngIf="!enabled">volume_off</mat-icon>
+    </button>
+    <button mat-icon-button class="example-icon" aria-label="Example icon-button with share icon" (click)="drawer.toggle()">
+      <mat-icon>settings</mat-icon>
+    </button>
+  </mat-toolbar>
 
-<h2>Active Calls ({{ calls.length }})</h2>
-<div *ngFor="let call of calls">
-  {{call.id}} | {{call.name}}
-</div>
+  <mat-drawer-container class="example-container" autosize>
+    <mat-drawer #drawer class="example-sidenav" mode="over" position="end">
+      <app-config></app-config>
 
-<h2>Call Queue ({{ callQueue.length }})</h2>
-<div *ngFor="let call of callQueue">
-  {{call.id}} | {{call.name}}
-</div>
+    </mat-drawer>
+
+    <div class="nowPlaying">
+
+        <div class="display">
+          <div class="line1">
+            <div *ngIf="nowPlaying" [matTooltip]="nowPlaying.talkgroup.description">{{nowPlaying.talkgroup.description}}</div>
+            <span *ngIf="!nowPlaying">Scanning...</span>
+          </div>
+          <div class="line2" *ngIf="nowPlaying">Unit ID: Station C</div>
+          <div class="line3" *ngIf="nowPlaying">
+            <span>TGID: {{nowPlaying.talkgroup.id}}</span>
+            <span>Freq: 855.0235</span>
+            <span>Test</span>
+          </div>
+        </div>
+        <div class="actions">
+          <button mat-raised-button [disabled]="!nowPlaying" (click)="avoid(nowPlaying?.talkgroup?.id)">Avoid</button>
+          <button mat-raised-button [disabled]="!nowPlaying"  (click)="skip(nowPlaying?.id)">Skip</button>
+          <button mat-raised-button [disabled]="!nowPlaying">Hold TG</button>
+          <button mat-raised-button>Replay Last</button>
+        </div>
+    </div>
+
+    <div class="content">
+      <div>
+        <h2>Calls Queue ({{ callQueue.length }})</h2>
+        <div  class="call-list">
+          <app-call *ngFor="let call of callQueue"
+            [call]="call"
+            [showAvoid]="true"
+            [showSkip]="true"
+            (avoidEvent)="avoid(call.talkgroup.id)"
+            (skipEvent)="skip(call.id)">
+          </app-call>
+        </div>
+      </div>
+
+      <div>
+        <h2>Active Calls ({{ activeTGs.length }})</h2>
+        <div  class="call-list">
+          <app-call *ngFor="let call of activeTGs"
+            [call]="call"
+            [showSkip]="false"
+            (avoidEvent)="avoid(call.talkgroup.id)"
+            (unavoidEvent)="unavoid(call.talkgroup.id)">
+          </app-call>
+        </div>
+      </div>
+
+    <div>
+      <h2>History Calls ({{ historyQueue.length }})</h2>
+      <div class="call-list">
+        <app-call *ngFor="let call of historyQueue"
+          [call]="call"
+          [showAvoid]="true"
+          [showSkip]="false"
+          (avoidEvent)="avoid(call.talkgroup.id)"
+          (unavoidEvent)="unavoid(call.talkgroup.id)"
+          (skipEvent)="skip(call.id)">
+        </app-call>
+      </div>
+
+    </div>
+  </div>
+
+
+
+</mat-drawer-container>

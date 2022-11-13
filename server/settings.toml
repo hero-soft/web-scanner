@@ -1,1 +1,3 @@
 service_http_port=8080
+talkgroups_file="trs_tg_736.csv"
+console_logs=true

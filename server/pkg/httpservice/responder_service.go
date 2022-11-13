@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/hero-soft/web-scanner/pkg/websocket"
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/promauto"
 	"go.uber.org/zap"
@@ -14,6 +15,7 @@ type HttpService struct {
 	permissiveHeaders bool
 	logger            *zap.SugaredLogger
 	counters          map[string]prometheus.Counter
+	SendChan          chan<- websocket.SendTo
 }
 
 func NewResponderService(baseUrl string, permissiveHeaders bool, logger *zap.SugaredLogger, counters map[string]prometheus.Counter) *HttpService {
@@ -24,18 +26,6 @@ func NewResponderService(baseUrl string, permissiveHeaders bool, logger *zap.Sug
 	counters["health_hits"] = newHitCounter("health")
 
 	counters["directory_hits"] = newHitCounter("directory")
-	counters["issuing_certificate_hits"] = newHitCounter("issuing certificate")
-	counters["account_hits"] = newHitCounter("new account")
-	counters["nonce_hits"] = newHitCounter("new_nonce ")
-	counters["new_order_hits"] = newHitCounter("new order")
-	counters["revoke_cert_hits"] = newHitCounter("revoke cert")
-	counters["key_change_hits"] = newHitCounter("key change")
-	counters["authz_hits"] = newHitCounter("authz")
-	counters["challenge_hits"] = newHitCounter("challenge")
-	counters["finalize_order_hits"] = newHitCounter("order finalize")
-	counters["get_order_hits"] = newHitCounter("get order")
-	counters["post_order_hits"] = newHitCounter("post order")
-	counters["cert_hits"] = newHitCounter("cert")
 
 	return &HttpService{
 		baseUrl:           baseUrl,

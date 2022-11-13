@@ -35,6 +35,7 @@ type application struct {
 	permissiveHeaders bool
 	baseURL           string
 	counters          map[string]prometheus.Counter
+	SendChan          chan<- websocket.SendTo
 }
 
 func main() {
@@ -97,10 +98,15 @@ func (app *application) run(ctx context.Context) error {
 
 		app.logger.Infof("Starting HTTP server on :%s", app.serviceHTTPPort)
 
-		hub := websocket.NewHub()
+		hub := websocket.NewHub(app.logger)
 		go hub.Run()
 
+		app.SendChan = hub.Send
+
 		httpService := httpservice.NewResponderService(app.baseURL, app.permissiveHeaders, app.logger, app.counters)
+
+		httpService.SendChan = app.SendChan
+
 		router := httpService.NewRouter(hub)
 
 		httpServer, httpErrorChan := app.startHTTPServer(app.serviceHTTPPort, router)

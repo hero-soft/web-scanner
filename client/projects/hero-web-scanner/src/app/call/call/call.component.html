@@ -1,0 +1,13 @@
+<div class="call" *ngIf="call">
+  <span class="text" [matTooltip]="call.talkgroup.id + ' | ' + call.talkgroup.description" >{{call.talkgroup.id}} | {{call.talkgroup.description}}</span>
+  <span class="spacer"></span>
+  <span class="actions">
+    <button mat-raised-button *ngIf="showAvoid && !disabled" (click)="avoid()">Avoid</button>
+    <button mat-raised-button *ngIf="showAvoid && disabled" (click)="unavoid()">Unavoid</button>
+    <button mat-raised-button *ngIf="showSkip" (click)="skip()">Skip</button>
+  </span>
+</div>
+
+<div class="call" *ngIf="!call">
+  No call
+</div>
