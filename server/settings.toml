@@ -1,3 +1,15 @@
-service_http_port=8080
+[client]
+test=true
+disabled_talkgroups = []
+show_active_calls= true
+play_unknown_talkgroups= true
+
+[client.server]
+    host="localhost:8080"
+
+
+
+[server]
+ervice_http_port=8080
 talkgroups_file="trs_tg_736.csv"
 console_logs=true

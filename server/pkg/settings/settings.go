@@ -1,7 +1,9 @@
 package settings
 
 import (
+	"encoding/json"
 	"fmt"
+	"os"
 
 	"github.com/spf13/viper"
 )
@@ -24,6 +26,18 @@ func New() (*viper.Viper, error) {
 	err := viper.ReadInConfig()               // Find and read the config file
 	if err != nil {                           // Handle errors reading the config file
 		panic(fmt.Errorf("fatal error config file: %w", err))
+	}
+
+	b, err := json.MarshalIndent(viper.Sub("client").AllSettings(), "", "  ")
+
+	if err != nil {
+		return nil, err
+	}
+
+	err = os.WriteFile("config.json", b, 0644)
+
+	if err != nil {
+		return nil, err
 	}
 
 	// viper.SetConfigFile(".env")

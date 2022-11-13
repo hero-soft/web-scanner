@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { Call } from './call/call.type';
-import { ConfigService } from './config/config.service';
+import { SettingsService } from './settings/settings.service';
 import { PlayerService } from './player/player.service';
 // import { KnownTalkgroups, Talkgroup } from './talkgroup.type';
 import { WebsocketService } from './websocket.service';
@@ -16,7 +16,7 @@ export class AppComponent implements OnInit{
   constructor(
     private ws: WebsocketService,
     private playerService: PlayerService,
-    private configService: ConfigService,
+    private settingsService: SettingsService,
   ) {}
 
   enabled = true;
@@ -104,7 +104,7 @@ export class AppComponent implements OnInit{
             return
           }
 
-          if (!this.configService.checkTalkgroup(call.talkgroup.id)) {
+          if (!this.settingsService.checkTalkgroup(call.talkgroup.id)) {
             console.log("skipping call", call.talkgroup.id, call.talkgroup.name);
             return
           }
@@ -139,7 +139,7 @@ export class AppComponent implements OnInit{
       this.playerService.dequeue(this.nowPlaying.id);
     }
 
-    this.configService.disableTalkgroup(tgid);
+    this.settingsService.disableTalkgroup(tgid);
 
     this.callQueue = this.callQueue.filter(call => {
       if (call.talkgroup.id !== tgid) {
@@ -157,7 +157,7 @@ export class AppComponent implements OnInit{
       return
     }
 
-    this.configService.enableTalkgroup(tgid);
+    this.settingsService.enableTalkgroup(tgid);
   }
 
   skip(id: string | undefined) {

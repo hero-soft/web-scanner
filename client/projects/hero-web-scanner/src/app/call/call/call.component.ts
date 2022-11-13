@@ -1,6 +1,6 @@
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { Call } from '../call.type';
-import { ConfigService } from '../../config/config.service';
+import { SettingsService } from '../../settings/settings.service';
 
 @Component({
   selector: 'app-call',
@@ -19,11 +19,11 @@ export class CallComponent implements OnInit {
   disabled = false
 
   constructor(
-    private configService: ConfigService,
+    private settingsService: SettingsService,
   ) { }
 
   ngOnInit(): void {
-    this.configService.disabledTalkgroups$.subscribe((disabled) => {
+    this.settingsService.disabledTalkgroups$.subscribe((disabled) => {
       this.disabled = disabled.includes(this.call?.talkgroup.id as string)
     })
   }

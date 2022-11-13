@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { FormsModule } from '@angular/forms';
 
-import { ConfigComponent } from './config/config.component';
+import { SettingsComponent } from './settings/settings.component';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatIconModule } from '@angular/material/icon';
@@ -13,7 +13,7 @@ import { MatCheckboxModule } from '@angular/material/checkbox';
 
 @NgModule({
   declarations: [
-    ConfigComponent
+    SettingsComponent
   ],
   imports: [
     FormsModule,
@@ -26,7 +26,7 @@ import { MatCheckboxModule } from '@angular/material/checkbox';
     MatCheckboxModule,
   ],
   exports: [
-    ConfigComponent
+    SettingsComponent
   ]
 })
-export class ConfigModule { }
+export class SettingsModule { }

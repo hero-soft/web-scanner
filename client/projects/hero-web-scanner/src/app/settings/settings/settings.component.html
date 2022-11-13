@@ -4,8 +4,8 @@
   <h4>Server</h4>
   <mat-form-field class="example-form-field" appearance="fill">
     <mat-label>Host</mat-label>
-    <input matInput type="text" [(ngModel)]="config.server.host">
-    <button *ngIf="config.server.host" matSuffix mat-icon-button aria-label="Clear" (click)="config.server.host=''">
+    <input matInput type="text" [(ngModel)]="settings.server.host">
+    <button *ngIf="settings.server.host" matSuffix mat-icon-button aria-label="Clear" (click)="settings.server.host=''">
       <mat-icon>close</mat-icon>
     </button>
   </mat-form-field>

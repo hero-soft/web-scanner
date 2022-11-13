@@ -1,24 +1,24 @@
 import { Component, OnInit } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { TalkgroupDialogComponent } from '../../talkgroup/dialog/dialog.component';
-import { ConfigService } from '../config.service';
-import { Config } from '../config.type';
+import { SettingsService } from '../settings.service';
+import { Settings } from '../settings.type';
 
 @Component({
   selector: 'app-config',
-  templateUrl: './config.component.html',
-  styleUrls: ['./config.component.scss']
+  templateUrl: './settings.component.html',
+  styleUrls: ['./settings.component.scss']
 })
-export class ConfigComponent implements OnInit {
-  config: Config = {} as Config;
+export class SettingsComponent implements OnInit {
+  settings: Settings = {} as Settings;
 
   constructor(
-    private ConfigService: ConfigService,
+    private settingsService: SettingsService,
     public dialog: MatDialog,
   ) { }
 
   ngOnInit(): void {
-    this.config = this.ConfigService.getConfig();
+    this.settings = this.settingsService.getSettings();
   }
 
   openDialog(): void {
