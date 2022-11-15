@@ -19,7 +19,7 @@ jobs:
       - id: set-matrix
         run: |
           TASKS=$(echo $(cat .github/workflows/go-matrix.json) | sed 's/ //g' )
-          echo "matrix=$TASKS" >> $GITHUB_OUTPUT
+          echo 'matrix=$TASKS' >> $GITHUB_OUTPUT
 
   build-server:
     name: Build Server
