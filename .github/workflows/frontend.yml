@@ -9,7 +9,6 @@ on:
   #     - "*"
   #     - "!main"
 
-env: {}
 
 jobs:
   setup-matrix:
@@ -20,14 +19,14 @@ jobs:
       - id: set-matrix
         run: |
           TASKS=$(echo $(cat .github/workflows/go-matrix.json) | sed 's/ //g' )
-          echo 'matrix=$TASKS' >> $GITHUB_ENV
+          echo 'matrix=$TASKS' >> $GITHUB_OUTPUT
 
   build-server:
     name: Build Server
     runs-on: ubuntu-latest
     needs: [setup-matrix]
     strategy:
-      matrix: ${{fromJSON(env.matrix)}}
+      matrix: ${{fromJSON(needs.setup-matrix.outputs.matrix)}}
     steps:
       - name: Check out the repo
         uses: actions/checkout@v2
@@ -62,7 +61,7 @@ jobs:
     runs-on: ubuntu-latest
     needs: [setup-matrix, build-server, build-client]
     strategy:
-      matrix: ${{fromJSON(env.matrix)}}
+      matrix: ${{fromJSON(needs.setup-matrix.outputs.matrix)}}
     steps:
       - run: |
           # cd dist
