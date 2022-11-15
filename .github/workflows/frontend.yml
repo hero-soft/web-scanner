@@ -1,4 +1,4 @@
-name: Build and Publish Image
+name: Build and Publish Release
 
 on:
   push:
@@ -21,48 +21,30 @@ jobs:
           TASKS=$(echo $(cat .github/workflows/go-matrix.json) | sed 's/ //g' )
           echo "::set-output name=matrix::$TASKS"
 
-  checkout-repo:
-    name: Checkout Repo
-    runs-on: ubuntu-latest
-    steps:
-      - name: Check out the repo
-        uses: actions/checkout@v2
-
-  test:
-    runs-on: ubuntu-latest
-    needs: [setup-matrix]
-    steps:
-      - run: echo ${{needs.setup-matrix.outputs.matrix}}
-
   build-server:
     name: Build Server
     runs-on: ubuntu-latest
-    needs: [setup-matrix, checkout-repo]
+    needs: [setup-matrix]
     strategy:
       matrix: ${{fromJSON(needs.setup-matrix.outputs.matrix)}}
     steps:
+      - name: Check out the repo
+        uses: actions/checkout@v2
       - name: Set up Go
         uses: actions/setup-go@v3
         with:
           go-version: 1.18
       - name: Build server
         run: cd ./server; GOOS="${{ matrix.target.os }}" GOARCH="${{ matrix.target.arch }}" go build -o ../dist/server/web-scanner-${{ matrix.target.os }}-${{ matrix.target.arch }} .
-  
-
-  
-  copy-settings:
-    name: Copy settings
-    runs-on: ubuntu-latest
-    needs: checkout-repo
-    steps:
       - name: Copy server default settings file
         run: cp ./server/settings.toml ./dist/
      
   build-client:
     name: Build client
     runs-on: ubuntu-latest
-    needs: checkout-repo
     steps:
+      - name: Check out the repo
+        uses: actions/checkout@v2
       - name: Setup Node.js 
         uses: actions/setup-node@v3
         with:
@@ -76,7 +58,7 @@ jobs:
   zip-file:
     name: Zip files
     runs-on: ubuntu-latest
-    needs: [setup-matrix,build-server, build-client]
+    needs: [setup-matrix, build-server, build-client]
     strategy:
       matrix: ${{fromJSON(needs.setup-matrix.outputs.matrix)}}
     steps:
