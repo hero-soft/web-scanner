@@ -9,6 +9,7 @@ on:
   #     - "*"
   #     - "!main"
 
+env: {}
 
 jobs:
   setup-matrix:
