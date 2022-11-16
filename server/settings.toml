@@ -21,7 +21,7 @@
 
 [client.server]
     # This is where the client will attempt to connect
-    host="localhost:8080"
+    host="ws://localhost:8080/ws/client"
 
 
 
