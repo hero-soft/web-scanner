@@ -27,7 +27,7 @@ type record struct { // Our example struct, you can use "-" to ignore a field
 }
 
 func GetAll() ([]*Talkgroup, error) {
-	talkgroupsFile, err := os.OpenFile(viper.GetString("talkgroups_file"), os.O_RDWR|os.O_CREATE, os.ModePerm)
+	talkgroupsFile, err := os.OpenFile(viper.GetString("server.talkgroups_file"), os.O_RDWR|os.O_CREATE, os.ModePerm)
 	if err != nil {
 		return nil, fmt.Errorf("could not open talkgroups file: %v", err)
 	}
@@ -55,7 +55,7 @@ func GetAll() ([]*Talkgroup, error) {
 }
 
 func Lookup(talkgroupID string, fallback string) (*Talkgroup, error) {
-	talkgroupsFile, err := os.OpenFile(viper.GetString("talkgroups_file"), os.O_RDWR|os.O_CREATE, os.ModePerm)
+	talkgroupsFile, err := os.OpenFile(viper.GetString("server.talkgroups_file"), os.O_RDWR|os.O_CREATE, os.ModePerm)
 	if err != nil {
 		return nil, fmt.Errorf("could not open talkgroups file: %v", err)
 	}

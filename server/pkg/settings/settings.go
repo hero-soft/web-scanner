@@ -10,11 +10,11 @@ import (
 
 func New() (*viper.Viper, error) {
 
-	viper.SetDefault("service_http_port", "8080")
-	viper.SetDefault("metrics_port", "9090")
-	viper.SetDefault("permissive_headers", true)
-	viper.SetDefault("talkgroups_file", "")
-	viper.SetDefault("console_logs", false)
+	viper.SetDefault("server.service_http_port", "8080")
+	viper.SetDefault("server.metrics_port", "9090")
+	viper.SetDefault("server.permissive_headers", true)
+	viper.SetDefault("server.talkgroups_file", "")
+	viper.SetDefault("server.console_logs", false)
 	// viper.SetDefault("LayoutDir", "layouts")
 	// viper.SetDefault("Taxonomies", map[string]string{"tag": "tags", "category": "categories"})
 
@@ -34,7 +34,7 @@ func New() (*viper.Viper, error) {
 		return nil, err
 	}
 
-	err = os.WriteFile("config.json", b, 0644)
+	err = os.WriteFile("./client/config.json", b, 0644)
 
 	if err != nil {
 		return nil, err

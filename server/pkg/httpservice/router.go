@@ -23,10 +23,7 @@ func (h *HttpService) NewRouter(hub *websocket.Hub) *mux.Router {
 	// Index
 	// router.Methods("OPTIONS").
 	// 	Path("*").
-	router.
-		Methods("GET").
-		Path("/").
-		Handler(http.HandlerFunc(h.index))
+
 	router.
 		Methods("GET", "OPTIONS").
 		Path("/ws/client").
@@ -43,11 +40,18 @@ func (h *HttpService) NewRouter(hub *websocket.Hub) *mux.Router {
 		// Methods("GET", "POST", "OPTIONS").
 		Path("/talkgroups").
 		Handler(http.HandlerFunc(h.talkgroups))
-
 	router.
 		Methods("GET", "OPTIONS").
 		PathPrefix("/audio/").
 		Handler(http.StripPrefix("/audio/", http.FileServer(http.Dir("./audio"))))
+	router.
+		Methods("GET").
+		Path("/").
+		Handler(http.HandlerFunc(h.index))
+	router.
+		Methods("GET").
+		PathPrefix("/").
+		Handler(http.StripPrefix("/", http.FileServer(http.Dir("./client"))))
 
 	// router.
 	// 	Methods("POST", "OPTIONS").
