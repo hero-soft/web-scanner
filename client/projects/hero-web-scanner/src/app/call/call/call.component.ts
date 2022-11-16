@@ -24,6 +24,10 @@ export class CallComponent implements OnInit {
 
   ngOnInit(): void {
     this.settingsService.disabledTalkgroups$.subscribe((disabled) => {
+      if (!disabled) {
+        this.disabled = false
+        return
+      }
       this.disabled = disabled.includes(this.call?.talkgroup.id as string)
     })
   }

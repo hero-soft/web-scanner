@@ -19,6 +19,7 @@ func (h *HttpService) secureHeaders(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("X-XSS-Protection", "1; mode=block")
 		w.Header().Set("X-Frame-Options", "deny")
+		w.Header().Set("Feature-Policy", "autoplay '*'")
 
 		// if h.permissiveHeaders {
 		w.Header().Set("Access-Control-Allow-Headers", "content-type,authorization,cache-control,ngsw-bypass,pragma")
