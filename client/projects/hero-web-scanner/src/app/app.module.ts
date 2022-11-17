@@ -1,4 +1,4 @@
-import { NgModule } from '@angular/core';
+import { NgModule, isDevMode } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 
 import { AppRoutingModule } from './app-routing.module';
@@ -21,6 +21,7 @@ import { TalkgroupModule } from './talkgroup/talkgroup.module';
 import { DBConfig, NgxIndexedDBModule } from 'ngx-indexed-db';
 import { AngularRuntimeConfigModule } from 'angular-runtime-config';
 import { Settings } from './settings/settings.type';
+import { ServiceWorkerModule } from '@angular/service-worker';
 
 
 const dbConfig: DBConfig  = {
@@ -57,6 +58,12 @@ const dbConfig: DBConfig  = {
     MatTooltipModule,
     MatProgressSpinnerModule,
     TalkgroupModule,
+    ServiceWorkerModule.register('ngsw-worker.js', {
+      enabled: !isDevMode(),
+      // Register the ServiceWorker as soon as the application is stable
+      // or after 30 seconds (whichever comes first).
+      registrationStrategy: 'registerWhenStable:30000'
+    }),
   ],
   providers: [
     WebsocketService
