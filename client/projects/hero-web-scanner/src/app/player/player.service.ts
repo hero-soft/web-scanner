@@ -19,6 +19,7 @@ export class PlayerService {
   private playing: Track | undefined = undefined
   private baseURL = environment.serverURL
   private enabled = true
+  private autoplayDialogShown = false
 
   public enabled$ = new BehaviorSubject<boolean>(this.enabled)
   public playing$: BehaviorSubject<Track | undefined> = new BehaviorSubject(this.playing)
@@ -124,11 +125,15 @@ export class PlayerService {
         this.player.play().catch((e) => {
           if (e.name === "NotAllowedError") {
             console.log("error playing audio", e);
-            const dialog = this.dialog.open(AutoplayDialogComponent)
 
-            dialog.afterClosed().subscribe((result) => {
-              this.player.play()
-            })
+            if (!this.autoplayDialogShown) {
+              this.autoplayDialogShown = true
+              const dialog = this.dialog.open(AutoplayDialogComponent)
+
+              dialog.afterClosed().subscribe((result) => {
+                this.player.play()
+              })
+            }
           }
         });
       }
