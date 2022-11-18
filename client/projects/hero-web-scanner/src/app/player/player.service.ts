@@ -3,6 +3,7 @@ import { Injectable } from '@angular/core';
 import { BehaviorSubject } from 'rxjs';
 import { environment } from '../../environments/environment';
 import { AutoplayDialogComponent } from './autoplay-dialog/autoplay-dialog.component';
+import { SettingsService } from '../settings/settings.service';
 
 export interface Track {
   id: string;
@@ -17,7 +18,7 @@ export class PlayerService {
   private player = new Audio()
   private queue: Track[] = []
   private playing: Track | undefined = undefined
-  private baseURL = environment.serverURL
+  private baseURL = ""
   private enabled = true
   private autoplayDialogShown = false
 
@@ -25,8 +26,13 @@ export class PlayerService {
   public playing$: BehaviorSubject<Track | undefined> = new BehaviorSubject(this.playing)
 
   constructor(
-    private dialog: MatDialog
+    private dialog: MatDialog,
+    private settings: SettingsService
   ) {
+    this.settings.settings$.subscribe(settings => {
+      this.baseURL = settings.server.uri
+    })
+
     this.player.addEventListener('ended', () => {
       this.tryNext()
     });

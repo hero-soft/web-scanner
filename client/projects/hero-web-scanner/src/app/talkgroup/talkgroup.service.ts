@@ -18,12 +18,12 @@ export class TalkgroupService {
     private http: HttpClient,
     private settingsService: SettingsService,
   ) {
-    this.updateTalkgroups()
+    this.updateTalkgroups(this.settingsService.getSettings().server.uri)
 
     this.settingsService.settings$.subscribe(settings => {
       if (settings.server.uri !== this.currentURI) {
         this.currentURI = settings.server.uri
-        this.updateTalkgroups()
+        this.updateTalkgroups(this.currentURI)
       }
 
       this.talkgroups.forEach(talkgroup => {
@@ -33,8 +33,8 @@ export class TalkgroupService {
     })
   }
 
-  updateTalkgroups(){
-    this.http.get<Talkgroup[]>(environment.serverURL + 'talkgroups').subscribe(talkgroups => {
+  updateTalkgroups(base_uri: string){
+    this.http.get<Talkgroup[]>(base_uri + 'talkgroups').subscribe(talkgroups => {
 
       talkgroups.forEach(talkgroup => {
         talkgroup.disabled = !this.settingsService.checkTalkgroup(talkgroup.id)
