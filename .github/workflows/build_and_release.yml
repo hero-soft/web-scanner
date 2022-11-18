@@ -120,6 +120,7 @@ jobs:
         with:
           name: web-scanner-${{ matrix.target.os }}-${{ matrix.target.arch }}
       - run: |
+          ls -la
           OUTPATH=./dist/web-scanner-${{ matrix.target.os }}-${{ matrix.target.arch }}/web-scanner
           mkdir -p $OUTPATH
           cp -r ./web-scanner-${{ matrix.target.os }}-${{ matrix.target.arch }} $OUTPATH
