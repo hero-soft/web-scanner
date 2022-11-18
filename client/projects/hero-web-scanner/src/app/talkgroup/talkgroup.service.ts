@@ -12,6 +12,7 @@ export class TalkgroupService {
   private talkgroups: Talkgroup[] = []
 
   talkgroups$: BehaviorSubject<Talkgroup[]> = new BehaviorSubject(this.talkgroups)
+  currentURI: string = ""
 
   constructor(
     private http: HttpClient,
@@ -20,9 +21,15 @@ export class TalkgroupService {
     this.updateTalkgroups()
 
     this.settingsService.settings$.subscribe(settings => {
+      if (settings.server.uri !== this.currentURI) {
+        this.currentURI = settings.server.uri
+        this.updateTalkgroups()
+      }
+
       this.talkgroups.forEach(talkgroup => {
         talkgroup.disabled = !this.settingsService.checkTalkgroup(talkgroup.id)
       })
+
     })
   }
 
