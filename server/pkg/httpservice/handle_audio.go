@@ -1,7 +1,6 @@
 package httpservice
 
 import (
-	"fmt"
 	"io"
 	"net/http"
 	"os"
@@ -52,8 +51,7 @@ func (h HttpService) audio(w http.ResponseWriter, r *http.Request) {
 	tg, err := talkgroup.Lookup(talkgroupID, "UNKNOWN")
 
 	if err != nil {
-		fmt.Println("Error looking up talkgroup", err)
-		return
+		h.logger.Errorf("Error looking up talkgroup: %v", err)
 	}
 
 	h.SendChan <- websocket.SendTo{
@@ -62,7 +60,7 @@ func (h HttpService) audio(w http.ResponseWriter, r *http.Request) {
 			Type: "audio",
 			Call: call.Call{
 				ID:        uuid.NewV4().String(),
-				Talkgroup: *tg,
+				Talkgroup: tg,
 				File:      filename,
 			},
 		},

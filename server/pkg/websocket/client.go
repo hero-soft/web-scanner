@@ -112,7 +112,6 @@ func (c *Client) recorderReadPump() {
 
 				if err != nil {
 					fmt.Println("Error looking up talkgroup", err)
-					return
 				}
 
 				outMessage.Calls = append(outMessage.Calls, call.Call{
