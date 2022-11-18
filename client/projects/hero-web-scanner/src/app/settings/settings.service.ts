@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { BehaviorSubject } from 'rxjs';
+import { BehaviorSubject, Observable } from 'rxjs';
 import { Settings } from './settings.type';
 import { NgxIndexedDBService } from 'ngx-indexed-db';
 
@@ -7,32 +7,33 @@ import { NgxIndexedDBService } from 'ngx-indexed-db';
   providedIn: 'root'
 })
 export class SettingsService {
-  // private settings: Settings = {
-  //   id: 1,
-  //   server: {
-  //     host: "localhost:8080"
-  //   },
-  //   showActiveCalls: true,
-  //   playUnknownTalkgroups: true,
-  //   disabledTalkgroups: [],
-  // } as Settings;
-
-  disabledTalkgroups$ = new BehaviorSubject<string[]>(this.settings.disabled_talkgroups);
+  private settings = {} as Settings
+  settings$ = new BehaviorSubject<Settings>(this.settings);
 
   constructor(
     private db: NgxIndexedDBService,
-    private settings: Settings,
-  ) {
+    private defaultSettings: Settings,
+  ) {}
 
+  public loadData(): Promise<Settings> {
+   return new Promise<Settings>((resolve, reject) => {
     this.db.getByKey('settings', 1).subscribe((settings: any) => {
       if (settings) {
+
         this.settings = settings as Settings;
-        this.disabledTalkgroups$.next(this.settings.disabled_talkgroups);
+        this.settings$.next(this.settings);
+
+        resolve(this.settings);
       } else {
-        this.db.add('settings',this.settings).subscribe(() => {
+        this.db.add('settings',this.defaultSettings).subscribe(() => {
           console.log("added settings to database")
+
+          this.settings$.next(this.settings);
+
+          resolve(this.settings);
         })
       }
+    })
     })
   }
 
@@ -40,6 +41,7 @@ export class SettingsService {
     this.db.update('settings', this.settings).subscribe(() => {
       console.log("saved settings")
     })
+    this.settings$.next(this.settings);
   }
 
   getSettings(): Settings {
@@ -55,20 +57,34 @@ export class SettingsService {
 
     console.log("disabled talkgroups", this.settings.disabled_talkgroups);
 
-    this.disabledTalkgroups$.next(this.settings.disabled_talkgroups);
-
     this.saveSettings();
   }
 
   enableTalkgroup(t: string) {
     this.settings.disabled_talkgroups = this.settings.disabled_talkgroups.filter((tg) => tg !== t);
 
-    this.disabledTalkgroups$.next(this.settings.disabled_talkgroups);
-
     this.saveSettings();
   }
 
   checkTalkgroup(t: string): boolean {
     return !this.settings.disabled_talkgroups.includes(t);
+  }
+
+  setServerURI(uri: string) {
+    this.settings.server.uri = uri;
+
+    this.saveSettings();
+  }
+
+  setShowActiveCalls(show: boolean) {
+    this.settings.show_active_calls = show;
+
+    this.saveSettings();
+  }
+
+  setPlayUnknownTalkgroups(play: boolean) {
+    this.settings.play_unknown_talkgroups = play;
+
+    this.saveSettings();
   }
 }

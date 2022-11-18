@@ -19,9 +19,10 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { TalkgroupModule } from './talkgroup/talkgroup.module';
 
 import { DBConfig, NgxIndexedDBModule } from 'ngx-indexed-db';
-import { AngularRuntimeConfigModule } from 'angular-runtime-config';
+import { AngularRuntimeConfigModule, CONFIGURATION_APP_INITIALIZER } from 'angular-runtime-config';
 import { Settings } from './settings/settings.type';
 import { ServiceWorkerModule } from '@angular/service-worker';
+import { SettingsService } from './settings/settings.service';
 
 
 const dbConfig: DBConfig  = {
@@ -66,7 +67,13 @@ const dbConfig: DBConfig  = {
     }),
   ],
   providers: [
-    WebsocketService
+    WebsocketService,
+    {
+      provide: CONFIGURATION_APP_INITIALIZER,
+      useFactory: (settings: SettingsService) => () => {return settings.loadData()},
+      deps: [SettingsService],
+      multi: true
+    }
   ],
   bootstrap: [AppComponent]
 })

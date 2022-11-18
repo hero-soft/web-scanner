@@ -27,7 +27,8 @@ export class WebsocketService {
     constructor(
       private settings: SettingsService
     ) {
-      this.connect(this.settings.getSettings().server.host)
+      console.log("settings", this.settings.getSettings());
+      this.connect(this.settings.getSettings().server.uri)
     }
 
     // public connect(url: string): AnonymousSubject<MessageEvent> {

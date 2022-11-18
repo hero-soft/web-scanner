@@ -15,9 +15,9 @@ export class AppComponent implements OnInit{
   status: ConnectionStatus = ConnectionStatus.DISCONNECTED;
 
   constructor(
+    private settingsService: SettingsService,
     private ws: WebsocketService,
     private playerService: PlayerService,
-    private settingsService: SettingsService,
   ) {}
 
   enabled = true;

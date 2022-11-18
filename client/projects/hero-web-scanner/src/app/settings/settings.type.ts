@@ -1,7 +1,7 @@
 export class Settings {
   id!: number;
   server!: {
-    host: string;
+    uri: string;
   }
   disabled_talkgroups!: string[]
   show_active_calls!: boolean;

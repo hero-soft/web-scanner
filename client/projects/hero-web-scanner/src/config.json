@@ -1,7 +1,7 @@
 {
   "id": 1,
   "server": {
-    "host": "ws://localhost:8080/ws/client"
+    "uri": "ws://localhost:8080/ws/client"
   },
   "show_active_calls": true,
   "play_unknown_talkgroups": true,

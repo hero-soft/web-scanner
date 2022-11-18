@@ -1,7 +1,7 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
-import { FormsModule } from '@angular/forms';
+import { ReactiveFormsModule } from '@angular/forms';
 
 import { SettingsComponent } from './settings/settings.component';
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -16,7 +16,7 @@ import { MatCheckboxModule } from '@angular/material/checkbox';
     SettingsComponent
   ],
   imports: [
-    FormsModule,
+    ReactiveFormsModule,
     BrowserAnimationsModule,
     CommonModule,
     MatFormFieldModule,

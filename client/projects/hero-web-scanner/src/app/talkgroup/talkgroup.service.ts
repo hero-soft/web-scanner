@@ -2,6 +2,7 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { BehaviorSubject } from 'rxjs';
 import { environment } from '../../environments/environment';
+import { SettingsService } from '../settings/settings.service';
 import { Talkgroup } from './talkgroup.type';
 
 @Injectable({
@@ -14,12 +15,23 @@ export class TalkgroupService {
 
   constructor(
     private http: HttpClient,
+    private settingsService: SettingsService,
   ) {
     this.updateTalkgroups()
+
+    this.settingsService.settings$.subscribe(settings => {
+      this.talkgroups.forEach(talkgroup => {
+        talkgroup.disabled = !this.settingsService.checkTalkgroup(talkgroup.id)
+      })
+    })
   }
 
   updateTalkgroups(){
     this.http.get<Talkgroup[]>(environment.serverURL + 'talkgroups').subscribe(talkgroups => {
+
+      talkgroups.forEach(talkgroup => {
+        talkgroup.disabled = !this.settingsService.checkTalkgroup(talkgroup.id)
+      })
 
       talkgroups.sort((a, b) => {
         if (a.name < b.name) {
@@ -34,6 +46,5 @@ export class TalkgroupService {
       this.talkgroups = talkgroups
       this.talkgroups$.next(this.talkgroups)
     })
-
   }
 }

@@ -32,18 +32,18 @@
             <div *ngIf="nowPlaying" [matTooltip]="nowPlaying.talkgroup.description">{{nowPlaying.talkgroup.description}}</div>
             <span *ngIf="!nowPlaying">Scanning...</span>
           </div>
-          <div class="line2" *ngIf="nowPlaying">Unit ID: Station C</div>
+          <div class="line2" *ngIf="nowPlaying">Unit ID: ##########</div>
           <div class="line3" *ngIf="nowPlaying">
             <span>TGID: {{nowPlaying.talkgroup.id}}</span>
-            <span>Freq: 855.0235</span>
-            <span>Test</span>
+            <span>Freq: ###.####</span>
+            <span></span>
           </div>
         </div>
         <div class="actions">
           <button mat-raised-button [disabled]="!nowPlaying" (click)="avoid(nowPlaying?.talkgroup?.id)">Avoid</button>
           <button mat-raised-button [disabled]="!nowPlaying"  (click)="skip(nowPlaying?.id)">Skip</button>
-          <button mat-raised-button [disabled]="!nowPlaying">Hold TG</button>
-          <button mat-raised-button>Replay Last</button>
+          <!-- <button mat-raised-button [disabled]="!nowPlaying">Hold TG</button>
+          <button mat-raised-button>Replay Last</button> -->
         </div>
     </div>
 
