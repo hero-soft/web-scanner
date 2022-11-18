@@ -48,7 +48,7 @@ func (h HttpService) audio(w http.ResponseWriter, r *http.Request) {
 
 	talkgroupID := r.FormValue("talkgroup_num")
 
-	tg, err := talkgroup.Lookup(talkgroupID, "UNKNOWN")
+	tg, err := talkgroup.Lookup(talkgroupID, "", "UNKNOWN")
 
 	if err != nil {
 		h.logger.Errorf("Error looking up talkgroup: %v", err)
