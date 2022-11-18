@@ -115,20 +115,27 @@ jobs:
         uses: actions/download-artifact@v3
         with:
           name: client
+          path: ./dist/web-scanner/client
       - name: Download Server
         uses: actions/download-artifact@v3
         with:
           name: web-scanner-${{ matrix.target.os }}-${{ matrix.target.arch }}
+          path: ./dist/web-scanner
       - run: |
-          ls -la
-          OUTPATH=./dist/web-scanner-${{ matrix.target.os }}-${{ matrix.target.arch }}/web-scanner
-          mkdir -p $OUTPATH
-          cp -r ./web-scanner-${{ matrix.target.os }}-${{ matrix.target.arch }} $OUTPATH
-          cp -r ./server $OUTPATH
-          cp ./dist/server/web-scanner-${{ matrix.target.os }}-${{ matrix.target.arch }} $OUTPATH
-          cd ./dist/web-scanner-${{ matrix.target.os }}-${{ matrix.target.arch }}
-          zip -r ../../web-scanner-${{ matrix.target.os }}-${{ matrix.target.arch }}.zip ./client ./settings.toml ./web-scanner-${{ matrix.target.os }}-${{ matrix.target.arch }}${{ matrix.target.ext }}
-      
+          # ls -la
+          # OUTPATH=./dist/web-scanner-${{ matrix.target.os }}-${{ matrix.target.arch }}/web-scanner
+          # mkdir -p $OUTPATH
+          # cp -r ./web-scanner-${{ matrix.target.os }}-${{ matrix.target.arch }} $OUTPATH
+          # cp -r ./server $OUTPATH
+          # cp ./dist/server/web-scanner-${{ matrix.target.os }}-${{ matrix.target.arch }} $OUTPATH
+          # cd ./dist/web-scanner-${{ matrix.target.os }}-${{ matrix.target.arch }}
+          zip -r ./web-scanner-${{ matrix.target.os }}-${{ matrix.target.arch }}.zip ./dist
+      - name: Archive Client
+        uses: actions/upload-artifact@v3
+        with:
+          name: zips
+          path: |
+            web-scanner-${{ matrix.target.os }}-${{ matrix.target.arch }}.zip
   
   # release:
   #   name: release
