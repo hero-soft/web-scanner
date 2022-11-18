@@ -52,7 +52,7 @@ jobs:
         with:
           go-version: 1.18
       - name: Build server
-        run: cd ./server; GOOS="${{ matrix.target.os }}" GOARCH="${{ matrix.target.arch }}" go build -o ../dist/server/web-scanner-${{ matrix.target.os }}-${{ matrix.target.arch }}{{ matrix.target.ext }} .
+        run: cd ./server; GOOS="${{ matrix.target.os }}" GOARCH="${{ matrix.target.arch }}" go build -o ../dist/server/web-scanner-${{ matrix.target.os }}-${{ matrix.target.arch }}${{ matrix.target.ext }} .
       - name: Copy server default settings file
         run: cp ./server/settings.toml ./dist/
      
@@ -107,7 +107,7 @@ jobs:
           cp settings.toml $OUTPATH
           cp ./dist/server/web-scanner-${{ matrix.target.os }}-${{ matrix.target.arch }} $OUTPATH
           cd ./dist/web-scanner-${{ matrix.target.os }}-${{ matrix.target.arch }}
-          zip -r ../../web-scanner-${{ matrix.target.os }}-${{ matrix.target.arch }}.zip ./client ./settings.toml ./web-scanner-${{ matrix.target.os }}-${{ matrix.target.arch }}{{ matrix.target.ext }}
+          zip -r ../../web-scanner-${{ matrix.target.os }}-${{ matrix.target.arch }}.zip ./client ./settings.toml ./web-scanner-${{ matrix.target.os }}-${{ matrix.target.arch }}${{ matrix.target.ext }}
   
   # release:
   #   name: release
