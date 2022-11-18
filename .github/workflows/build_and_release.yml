@@ -54,7 +54,13 @@ jobs:
       - name: Build server
         run: cd ./server; GOOS="${{ matrix.target.os }}" GOARCH="${{ matrix.target.arch }}" go build -o ../dist/server/web-scanner-${{ matrix.target.os }}-${{ matrix.target.arch }}${{ matrix.target.ext }} .
       - name: Copy server default settings file
-        run: cp ./server/settings.toml ./dist/
+        run: cp ./server/settings.toml ./dist/server
+      - name: Archive Server
+        uses: actions/upload-artifact@v3
+        with:
+          name: web-scanner-${{ matrix.target.os }}-${{ matrix.target.arch }}
+          path: |
+            ./dist/server
      
   build-client:
     name: Build client
@@ -65,13 +71,19 @@ jobs:
       - name: Setup Node.js 
         uses: actions/setup-node@v3
         with:
-          node-version: 14.x
+          node-version: 18.x
           cache: 'npm'
           cache-dependency-path: "./client/package-lock.json"
       - name: Install dependencies
         run: cd ./client; npm install
       - name: Build client
         run: cd ./client; npm run build-actions
+      - name: Archive Client
+        uses: actions/upload-artifact@v3
+        with:
+          name: client
+          path: |
+            ./dist/client
   
   zip-file:
     name: Zip files
@@ -99,15 +111,23 @@ jobs:
             arch: amd64
             ext: .exe
     steps:
+      - name: Download Client
+        uses: actions/download-artifact@v3
+        with:
+          name: client
+      - name: Download Server
+        uses: actions/download-artifact@v3
+        with:
+          name: web-scanner-${{ matrix.target.os }}-${{ matrix.target.arch }}
       - run: |
-          # cd dist
           OUTPATH=./dist/web-scanner-${{ matrix.target.os }}-${{ matrix.target.arch }}/web-scanner
           mkdir -p $OUTPATH
-          cp -r ./client $OUTPATH
-          cp settings.toml $OUTPATH
+          cp -r ./web-scanner-${{ matrix.target.os }}-${{ matrix.target.arch }} $OUTPATH
+          cp -r ./server $OUTPATH
           cp ./dist/server/web-scanner-${{ matrix.target.os }}-${{ matrix.target.arch }} $OUTPATH
           cd ./dist/web-scanner-${{ matrix.target.os }}-${{ matrix.target.arch }}
           zip -r ../../web-scanner-${{ matrix.target.os }}-${{ matrix.target.arch }}.zip ./client ./settings.toml ./web-scanner-${{ matrix.target.os }}-${{ matrix.target.arch }}${{ matrix.target.ext }}
+      
   
   # release:
   #   name: release
