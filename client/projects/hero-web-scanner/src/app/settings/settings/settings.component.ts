@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, EventEmitter, OnInit, Output } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { TalkgroupDialogComponent } from '../../talkgroup/dialog/dialog.component';
 import { SettingsService } from '../settings.service';
@@ -11,6 +11,8 @@ import { FormBuilder } from '@angular/forms';
   styleUrls: ['./settings.component.scss']
 })
 export class SettingsComponent implements OnInit {
+  @Output() close = new EventEmitter<null>();
+
   settings: Settings = {} as Settings;
 
   constructor(
@@ -28,6 +30,7 @@ export class SettingsComponent implements OnInit {
   });
 
   ngOnInit(): void {
+
     this.settings = this.settingsService.getSettings();
 
     this.settingsForm.controls.server.setValue(this.settings.server);
@@ -47,6 +50,8 @@ export class SettingsComponent implements OnInit {
       this.settingsService.setShowActiveCalls(this.settingsForm.controls.show_active_calls.value as boolean);
       this.settingsService.setPlayUnknownTalkgroups(this.settingsForm.controls.play_unknown_talkgroups.value as boolean);
     }
+
+    this.close.emit();
   }
 
 }

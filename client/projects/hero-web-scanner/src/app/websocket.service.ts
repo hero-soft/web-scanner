@@ -23,34 +23,37 @@ export class WebsocketService {
     private connectionStatus: ConnectionStatus = ConnectionStatus.DISCONNECTED;
     public connectionStatus$ = new BehaviorSubject<ConnectionStatus>(this.connectionStatus);
     public messages$ = new Subject<any>();
+    private ws!: WebSocket
+
 
     constructor(
       private settings: SettingsService
     ) {
       console.log("settings", this.settings.getSettings());
       this.connect(this.settings.getSettings().server.uri)
+
+      this.settings.settings$.subscribe((settings) => {
+
+        if (settings.server.uri !== this.ws.url) {
+          this.ws.close();
+          this.connect(settings.server.uri);
+        }
+      })
     }
 
-    // public connect(url: string): AnonymousSubject<MessageEvent> {
-    //     if (!this.subject) {
-    //         this.subject = this.create(url);
-    //     }
-    //     return this.subject;
-    // }
-
     private connect(url: string) {
-        let ws = new WebSocket(url);
+        this.ws = new WebSocket(url);
 
         this.connectionStatus = ConnectionStatus.CONNECTING;
         this.connectionStatus$.next(this.connectionStatus);
 
-        ws.addEventListener('open', () => {
+        this.ws.addEventListener('open', () => {
             this.connectionStatus = ConnectionStatus.CONNECTED;
             this.connectionStatus$.next(this.connectionStatus);
             console.log("Websocket open: " + url);
         })
 
-        ws.addEventListener('close', () => {
+        this.ws.addEventListener('close', () => {
             this.connectionStatus = ConnectionStatus.CONNECTING;
             this.connectionStatus$.next(this.connectionStatus);
             console.log("Websocket closed: " + url);
@@ -62,7 +65,7 @@ export class WebsocketService {
             }, 5000)
         })
 
-        ws.addEventListener('message', (message) => {
+        this.ws.addEventListener('message', (message) => {
             this.messages$.next(message);
         })
 

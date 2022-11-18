@@ -19,9 +19,9 @@
     </button>
   </mat-toolbar>
 
-  <mat-drawer-container class="example-container" autosize>
-    <mat-drawer #drawer class="example-sidenav" mode="over" position="end">
-      <app-config></app-config>
+  <mat-drawer-container autosize>
+    <mat-drawer #drawer mode="over" position="end">
+      <app-config (close)="drawer.close()"></app-config>
 
     </mat-drawer>
 
