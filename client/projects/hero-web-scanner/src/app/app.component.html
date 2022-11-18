@@ -32,12 +32,13 @@
             <div *ngIf="nowPlaying" [matTooltip]="nowPlaying.talkgroup.description">{{nowPlaying.talkgroup.description}}</div>
             <span *ngIf="!nowPlaying">Scanning...</span>
           </div>
-          <div class="line2" *ngIf="nowPlaying && enabled">Unit ID: ##########</div>
-          <div class="line3" *ngIf="nowPlaying && enabled">
+          <!-- <div class="line2" *ngIf="nowPlaying && enabled">Unit ID: ##########</div> -->
+          <div class="line2" *ngIf="nowPlaying && enabled">{{ nowPlaying.talkgroup.name }}</div>
+          <!-- <div class="line3" *ngIf="nowPlaying && enabled">
             <span>TGID: {{nowPlaying.talkgroup.id}}</span>
             <span>Freq: ###.####</span>
             <span></span>
-          </div>
+          </div> -->
         </div>
         <div class="actions">
           <button mat-raised-button [disabled]="!nowPlaying" (click)="avoid(nowPlaying?.talkgroup?.id)">Avoid</button>
