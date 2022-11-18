@@ -30,7 +30,7 @@ export class PlayerService {
     private settings: SettingsService
   ) {
     this.settings.settings$.subscribe(settings => {
-      this.baseURL = settings.server.uri
+      this.baseURL = "http://" + settings.server.uri + "/"
     })
 
     this.player.addEventListener('ended', () => {

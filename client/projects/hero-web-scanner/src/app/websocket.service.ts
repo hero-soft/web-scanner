@@ -30,15 +30,19 @@ export class WebsocketService {
       private settings: SettingsService
     ) {
       console.log("settings", this.settings.getSettings());
-      this.connect(this.settings.getSettings().server.uri)
+      this.connect(this.makeWSURI(this.settings.getSettings().server.uri))
 
       this.settings.settings$.subscribe((settings) => {
 
-        if (settings.server.uri !== this.ws.url) {
+        if (this.makeWSURI(settings.server.uri) !== this.ws.url) {
           this.ws.close();
-          this.connect(settings.server.uri);
+          this.connect(this.makeWSURI(settings.server.uri));
         }
       })
+    }
+
+    private makeWSURI(url: string):string {
+      return "ws://" + url + "/ws/client"
     }
 
     private connect(url: string) {
