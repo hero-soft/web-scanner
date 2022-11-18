@@ -27,10 +27,10 @@
 
     <div class="nowPlaying">
 
-        <div class="display">
+        <div class="display" [ngClass]="{'dark': !enabled}">
           <div class="line1">
             <div *ngIf="nowPlaying" [matTooltip]="nowPlaying.talkgroup.description">{{nowPlaying.talkgroup.description}}</div>
-            <span *ngIf="!nowPlaying">Scanning...</span>
+            <span *ngIf="!nowPlaying && enabled">Scanning...</span>
           </div>
           <div class="line2" *ngIf="nowPlaying">Unit ID: ##########</div>
           <div class="line3" *ngIf="nowPlaying">

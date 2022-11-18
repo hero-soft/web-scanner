@@ -16,6 +16,11 @@
     padding: 20px;
     gap: 10px;
 
+    .display.dark {
+      background-color: rgb(119, 118, 118);
+      color: white;
+    }
+
     .display {
       height: 100px;
       width: 500px;
@@ -32,6 +37,8 @@
       flex-direction: column;
 
       gap: 10px;
+
+
 
       .line1 {
         font-size: 20px;
