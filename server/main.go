@@ -91,7 +91,7 @@ func (app *application) run(ctx context.Context) error {
 
 	// Create audio directory if it does not exist
 	if _, err := os.Stat("audio"); os.IsNotExist(err) {
-		os.Mkdir("audio", 0755)
+		err = os.Mkdir("audio", 0755)
 
 		if err != nil {
 			app.logger.Errorf("Could not create audio directory: %v", err)
