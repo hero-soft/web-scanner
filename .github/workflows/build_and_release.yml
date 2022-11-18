@@ -59,6 +59,8 @@ jobs:
         run: cp ./server/settings.toml ./dist/server
       - name: Copy README to dist
         run: cp ./README.md ./dist/server
+      - name: Set permissions
+        run: chmod 775 ./dist/server/web-scanner-${{ matrix.target.os }}-${{ matrix.target.arch }}${{ matrix.target.ext }}
       - name: Archive Server
         uses: actions/upload-artifact@v3
         with:
@@ -76,7 +78,7 @@ jobs:
       - name: Setup Node.js 
         uses: actions/setup-node@v3
         with:
-          node-version: 18.x
+          node-version: 18
           cache: 'npm'
           cache-dependency-path: "./client/package-lock.json"
       - name: Install dependencies (with force)
@@ -121,14 +123,14 @@ jobs:
         uses: actions/download-artifact@v3
         with:
           name: client
-          path: ./dist/web-scanner/client
+          path: ./web-scanner/client
       - name: Download Server
         uses: actions/download-artifact@v3
         with:
           name: web-scanner-${{ matrix.target.os }}-${{ matrix.target.arch }}
-          path: ./dist/web-scanner
+          path: ./web-scanner
       - run: |
-          zip -r ./web-scanner-${{ matrix.target.os }}-${{ matrix.target.arch }}.zip ./dist
+          zip -r ./web-scanner-${{ matrix.target.os }}-${{ matrix.target.arch }}.zip ./web-scanner
       - name: Archive Client
         uses: actions/upload-artifact@v3
         with:

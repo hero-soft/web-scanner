@@ -28,6 +28,7 @@ export class SettingsService {
         this.db.add('settings',this.defaultSettings).subscribe(() => {
           console.log("added settings to database")
 
+          this.settings = this.defaultSettings;
           this.settings$.next(this.settings);
 
           resolve(this.settings);
