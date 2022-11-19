@@ -1,3 +1,27 @@
-service_http_port=8080
-talkgroups_file="trs_tg_736.csv"
-console_logs=true
+# Settings for the server
+[server]
+    # The port that the server will listen on
+    service_http_port=8080
+    # The file the server will use to lookup talkgroup info
+    # it will be checked each time a talkgroup is looked up
+    # there is no need to restart the server when this file changes
+    talkgroups_file="trs_tg_736.csv"
+    console_logs=true
+
+# Settings that will eb sent to the client as defaults
+# Once the client connects, it will cache these settings
+# and they must we changed in the UI for that client
+[client]
+    # Talkgroups the client will avoid (can be overridden in the UI)
+    disabled_talkgroups = []
+    # Show the active calls in the UI
+    show_active_calls= true
+    # Play talkgroups even if they are not in the talkgroups file
+    play_unknown_talkgroups= true
+
+[client.server]
+    # This is where the client will attempt to connect
+    uri="localhost:8080"
+
+
+

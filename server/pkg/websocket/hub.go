@@ -61,7 +61,7 @@ func (h *Hub) Run() {
 			uuid := uuid.NewV4()
 			client.clientID = uuid.String()
 
-			h.logger.Infof("Client registered: ", client.clientID)
+			h.logger.Infof("Client registered: %s", client.clientID)
 
 		case client := <-h.unregister:
 			if _, ok := h.clients[client]; ok {

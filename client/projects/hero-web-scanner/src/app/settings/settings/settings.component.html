@@ -1,0 +1,26 @@
+<h3>Settings</h3>
+
+<button mat-raised-button color="secondary" (click)="save()">Save Settings</button>
+
+<section class="config">
+  <form [formGroup]="settingsForm">
+    <div formGroupName="server">
+      <h4>Server</h4>
+      <mat-form-field class="example-form-field" appearance="fill">
+        <mat-label>URL</mat-label>
+        <input matInput type="text" formControlName="uri">
+        <!-- <button *ngIf="settings.server.uri" matSuffix mat-icon-button aria-label="Clear" (click)="settings.server.uri=''">
+          <mat-icon>close</mat-icon>
+        </button> -->
+      </mat-form-field>
+    </div>
+
+    <!-- <mat-checkbox formControlName="show_active_calls">Show active calls</mat-checkbox> -->
+
+    <h4>Talkgroups</h4>
+    <!-- <mat-checkbox formControlName="play_unknown_talkgroups">Play unknown talkgroups</mat-checkbox> -->
+    <button mat-raised-button color="primary" (click)="openDialog()">Select Talkgroups</button>
+  </form>
+</section>
+
+

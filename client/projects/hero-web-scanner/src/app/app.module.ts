@@ -1,4 +1,4 @@
-import { NgModule } from '@angular/core';
+import { NgModule, isDevMode } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 
 import { AppRoutingModule } from './app-routing.module';
@@ -7,26 +7,32 @@ import { WebsocketService } from './websocket.service';
 import { TgLookupPipe } from './tg-lookup.pipe';
 import { CallModule } from './call/call.module';
 import { PlayerModule } from './player/player.module';
-import { ConfigModule } from './config/config.module';
+import { SettingsModule } from './settings/settings.module';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 import { MatSidenavModule } from '@angular/material/sidenav';
-import {MatTooltipModule} from '@angular/material/tooltip';
+import { MatTooltipModule} from '@angular/material/tooltip';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { TalkgroupModule } from './talkgroup/talkgroup.module';
 
 import { DBConfig, NgxIndexedDBModule } from 'ngx-indexed-db';
+import { AngularRuntimeConfigModule, CONFIGURATION_APP_INITIALIZER } from 'angular-runtime-config';
+import { Settings } from './settings/settings.type';
+import { ServiceWorkerModule } from '@angular/service-worker';
+import { SettingsService } from './settings/settings.service';
+
 
 const dbConfig: DBConfig  = {
   name: 'HeroWebScanner',
   version: 1,
   objectStoresMeta: [{
-    store: 'config',
+    store: 'settings',
     storeConfig: { keyPath: 'id', autoIncrement: true },
     storeSchema: [
-      { name: 'config', keypath: 'config', options: { unique: false } },
+      { name: 'settings', keypath: 'settings', options: { unique: false } },
     ]
   }]
 };
@@ -40,20 +46,34 @@ const dbConfig: DBConfig  = {
     BrowserModule,
     AppRoutingModule,
     NgxIndexedDBModule.forRoot(dbConfig),
+    AngularRuntimeConfigModule.forRoot(Settings),
 
     CallModule,
     PlayerModule,
-    ConfigModule,
+    SettingsModule,
     BrowserAnimationsModule,
     MatToolbarModule,
     MatIconModule,
     MatButtonModule,
     MatSidenavModule,
     MatTooltipModule,
+    MatProgressSpinnerModule,
     TalkgroupModule,
+    ServiceWorkerModule.register('ngsw-worker.js', {
+      enabled: !isDevMode(),
+      // Register the ServiceWorker as soon as the application is stable
+      // or after 30 seconds (whichever comes first).
+      registrationStrategy: 'registerWhenStable:30000'
+    }),
   ],
   providers: [
-    WebsocketService
+    WebsocketService,
+    {
+      provide: CONFIGURATION_APP_INITIALIZER,
+      useFactory: (settings: SettingsService) => () => {return settings.loadData()},
+      deps: [SettingsService],
+      multi: true
+    }
   ],
   bootstrap: [AppComponent]
 })
