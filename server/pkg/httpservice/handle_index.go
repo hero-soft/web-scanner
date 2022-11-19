@@ -11,9 +11,7 @@ import (
 func (h HttpService) index(w http.ResponseWriter, r *http.Request) {
 	h.counters["index_hits"].Inc()
 
-	//http.Redirect(w, r, "/app", 301)
-	w.Header().Set("Content-Type", "text/JSON; charset=UTF-8")
-	fmt.Fprintf(w, "Hero Web Scanner")
+	http.ServeFile(w, r, "./client/index.html")
 }
 
 func (h HttpService) talkgroups(w http.ResponseWriter, r *http.Request) {

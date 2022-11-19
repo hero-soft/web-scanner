@@ -11,14 +11,13 @@ import (
 )
 
 type HttpService struct {
-	baseUrl           string
 	permissiveHeaders bool
 	logger            *zap.SugaredLogger
 	counters          map[string]prometheus.Counter
 	SendChan          chan<- websocket.SendTo
 }
 
-func NewResponderService(baseUrl string, permissiveHeaders bool, logger *zap.SugaredLogger, counters map[string]prometheus.Counter) *HttpService {
+func NewHttpService(permissiveHeaders bool, logger *zap.SugaredLogger, counters map[string]prometheus.Counter) *HttpService {
 
 	counters["not_found_hits"] = newHitCounter("not found")
 	counters["method_not_allowed_hits"] = newHitCounter("method not allowed")
@@ -28,7 +27,6 @@ func NewResponderService(baseUrl string, permissiveHeaders bool, logger *zap.Sug
 	counters["directory_hits"] = newHitCounter("directory")
 
 	return &HttpService{
-		baseUrl:           baseUrl,
 		permissiveHeaders: permissiveHeaders,
 		logger:            logger,
 		counters:          counters,

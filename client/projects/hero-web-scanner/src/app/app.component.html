@@ -2,6 +2,13 @@
 <div class="page">
   <mat-toolbar>
     <span>Hero Web Scanner</span>
+    <div class="status"
+    [ngClass]="{'connected': status === 'Connected',
+                'disconnected': status === 'Disconnected',
+                'connecting': status == 'Connecting'}"
+    >{{ status }}
+    <mat-spinner *ngIf="status == 'Connecting'" [diameter]="20" color="accent"></mat-spinner>
+    </div>
     <span class="spacer"></span>
     <button mat-icon-button class="example-icon favorite-icon" aria-label="Example icon-button with heart icon" (click)="enableClick()">
       <mat-icon *ngIf="enabled">volume_up</mat-icon>
@@ -12,31 +19,32 @@
     </button>
   </mat-toolbar>
 
-  <mat-drawer-container class="example-container" autosize>
-    <mat-drawer #drawer class="example-sidenav" mode="over" position="end">
-      <app-config></app-config>
+  <mat-drawer-container autosize>
+    <mat-drawer #drawer mode="over" position="end">
+      <app-config (close)="drawer.close()"></app-config>
 
     </mat-drawer>
 
     <div class="nowPlaying">
 
-        <div class="display">
-          <div class="line1">
+        <div class="display" [ngClass]="{'dark': !enabled}">
+          <div class="line1" *ngIf="enabled">
             <div *ngIf="nowPlaying" [matTooltip]="nowPlaying.talkgroup.description">{{nowPlaying.talkgroup.description}}</div>
             <span *ngIf="!nowPlaying">Scanning...</span>
           </div>
-          <div class="line2" *ngIf="nowPlaying">Unit ID: Station C</div>
-          <div class="line3" *ngIf="nowPlaying">
+          <!-- <div class="line2" *ngIf="nowPlaying && enabled">Unit ID: ##########</div> -->
+          <div class="line2" *ngIf="nowPlaying && enabled">{{ nowPlaying.talkgroup.name }}</div>
+          <!-- <div class="line3" *ngIf="nowPlaying && enabled">
             <span>TGID: {{nowPlaying.talkgroup.id}}</span>
-            <span>Freq: 855.0235</span>
-            <span>Test</span>
-          </div>
+            <span>Freq: ###.####</span>
+            <span></span>
+          </div> -->
         </div>
         <div class="actions">
           <button mat-raised-button [disabled]="!nowPlaying" (click)="avoid(nowPlaying?.talkgroup?.id)">Avoid</button>
           <button mat-raised-button [disabled]="!nowPlaying"  (click)="skip(nowPlaying?.id)">Skip</button>
-          <button mat-raised-button [disabled]="!nowPlaying">Hold TG</button>
-          <button mat-raised-button>Replay Last</button>
+          <!-- <button mat-raised-button [disabled]="!nowPlaying">Hold TG</button>
+          <button mat-raised-button>Replay Last</button> -->
         </div>
     </div>
 

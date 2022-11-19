@@ -1,18 +1,18 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { ConfigComponent } from './config.component';
+import { AutoplayDialogComponent } from './autoplay-dialog.component';
 
-describe('ConfigComponent', () => {
-  let component: ConfigComponent;
-  let fixture: ComponentFixture<ConfigComponent>;
+describe('AutoplayDialogComponent', () => {
+  let component: AutoplayDialogComponent;
+  let fixture: ComponentFixture<AutoplayDialogComponent>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [ ConfigComponent ]
+      declarations: [ AutoplayDialogComponent ]
     })
     .compileComponents();
 
-    fixture = TestBed.createComponent(ConfigComponent);
+    fixture = TestBed.createComponent(AutoplayDialogComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

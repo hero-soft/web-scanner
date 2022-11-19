@@ -16,6 +16,11 @@
     padding: 20px;
     gap: 10px;
 
+    .display.dark {
+      background-color: rgb(119, 118, 118);
+      color: white;
+    }
+
     .display {
       height: 100px;
       width: 500px;
@@ -32,6 +37,8 @@
       flex-direction: column;
 
       gap: 10px;
+
+
 
       .line1 {
         font-size: 20px;
@@ -129,4 +136,36 @@ mat-drawer-container {
     flex-direction: column;
     height: 100%;
   }
+}
+
+.status {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  padding: 5px 20px;
+  margin-left: 20px;
+
+  font-size: .9rem;
+
+  border: #000 solid 1px;
+  border-radius: 5px;
+
+  mat-spinner {
+    margin-left: 10px;
+    color: yellow;
+  }
+}
+
+.connected {
+  color: green;
+  border-color: green;
+}
+.disconnected {
+  color: red;
+  border-color: red;
+}
+.connecting {
+  color: yellow;
+  border-color: yellow;
 }

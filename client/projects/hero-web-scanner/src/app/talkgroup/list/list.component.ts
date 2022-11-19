@@ -1,4 +1,5 @@
 import { Component, Input, OnInit } from '@angular/core';
+import { SettingsService } from '../../settings/settings.service';
 import { Talkgroup } from '../talkgroup.type';
 
 @Component({
@@ -9,9 +10,18 @@ import { Talkgroup } from '../talkgroup.type';
 export class TalkgroupListComponent implements OnInit {
   @Input() talkgroups: Talkgroup[] = []
 
-  constructor() { }
+  constructor(private settingsService: SettingsService) { }
 
   ngOnInit(): void {
+
+  }
+
+  changeState(tgID: string, state: boolean){
+    if (!state){
+      this.settingsService.enableTalkgroup(tgID)
+    } else {
+      this.settingsService.disableTalkgroup(tgID)
+    }
   }
 
 }

@@ -53,7 +53,7 @@ type Client struct {
 
 func (c *Client) recorderReadPump() {
 	defer func() {
-		c.logger.Infof("Client unregistered: ", c.clientID)
+		c.logger.Infof("Client unregistered: %v", c.clientID)
 		c.hub.unregister <- c
 		c.conn.Close()
 	}()
@@ -108,11 +108,10 @@ func (c *Client) recorderReadPump() {
 			}
 
 			for _, iCall := range messageDetail.Calls {
-				tg, err := talkgroup.Lookup(iCall.Talkgroup, iCall.TalkgroupTag)
+				tg, err := talkgroup.Lookup(iCall.Talkgroup, iCall.Talkgroup, iCall.Talkgroup)
 
 				if err != nil {
 					fmt.Println("Error looking up talkgroup", err)
-					return
 				}
 
 				outMessage.Calls = append(outMessage.Calls, call.Call{
@@ -150,7 +149,7 @@ func (c *Client) recorderReadPump() {
 // reads from this goroutine.
 func (c *Client) clientReadPump() {
 	defer func() {
-		c.logger.Infof("Client unregistered: ", c.clientID)
+		c.logger.Infof("Client unregistered: %v", c.clientID)
 		c.hub.unregister <- c
 		c.conn.Close()
 	}()

@@ -1,9 +1,9 @@
 import { Component, OnInit } from '@angular/core';
 import { Call } from './call/call.type';
-import { ConfigService } from './config/config.service';
+import { SettingsService } from './settings/settings.service';
 import { PlayerService } from './player/player.service';
 // import { KnownTalkgroups, Talkgroup } from './talkgroup.type';
-import { WebsocketService } from './websocket.service';
+import { ConnectionStatus, WebsocketService } from './websocket.service';
 
 @Component({
   selector: 'app-root',
@@ -12,11 +12,12 @@ import { WebsocketService } from './websocket.service';
 })
 export class AppComponent implements OnInit{
   title = 'HeroWebScanner';
+  status: ConnectionStatus = ConnectionStatus.DISCONNECTED;
 
   constructor(
+    private settingsService: SettingsService,
     private ws: WebsocketService,
     private playerService: PlayerService,
-    private configService: ConfigService,
   ) {}
 
   enabled = true;
@@ -29,17 +30,15 @@ export class AppComponent implements OnInit{
 
   ngOnInit() {
 
+    this.ws.connectionStatus$.subscribe(status => {
+      this.status = status;
+    })
+
     this.playerService.playing$.subscribe((track) => {
       if (!track) {
         this.nowPlaying = undefined;
         return
       }
-
-      // this.nowPlaying = {
-      //   id: track.id,
-      //   talkgroup_id: track.id,
-      //   talkgroup_name: track.id,
-      // } as Call;
 
       this.callQueue = this.callQueue.filter((call) => {
         if (call.id !== track.id) {
@@ -58,7 +57,8 @@ export class AppComponent implements OnInit{
     })
 
     console.log("connecting to websocket");
-    this.ws.connect('ws://localhost:8080/ws/client').subscribe({
+
+    this.ws.messages$.subscribe({
       next: (message) => {
         let messageParsed: any = JSON.parse(message.data);
 
@@ -76,22 +76,7 @@ export class AppComponent implements OnInit{
           }
 
           this.activeTGs = messageParsed.calls
-          // console.log("calls_active", this.calls);
-        // } else if (messageParsed.type === "call_start") {
-        //   //  console.log("call_active", messageParsed.call);
 
-        //   let call = messageParsed.call
-        //   let known = KnownTalkgroups[call.talkgroup];
-
-        //   if (known == undefined) {
-        //     this.callQueue.push({id: call.talkgroup, name: "Unknown"});
-        //   } else {
-        //     this.callQueue.push(known);
-        //   }
-        // } else if (messageParsed.type === "call_end") {
-        //   console.log("!!!END", messageParsed.call);
-        // } else {
-        //   // console.log("message", messageParsed.type, messageParsed);
         }
 
         if (messageParsed.type === "audio") {
@@ -104,7 +89,7 @@ export class AppComponent implements OnInit{
             return
           }
 
-          if (!this.configService.checkTalkgroup(call.talkgroup.id)) {
+          if (!this.settingsService.checkTalkgroup(call.talkgroup.id)) {
             console.log("skipping call", call.talkgroup.id, call.talkgroup.name);
             return
           }
@@ -126,8 +111,8 @@ export class AppComponent implements OnInit{
       complete: () => {
         console.log('complete');
       }
+    })
   }
-  )}
 
 
   avoid(tgid: string | undefined) {
@@ -139,7 +124,7 @@ export class AppComponent implements OnInit{
       this.playerService.dequeue(this.nowPlaying.id);
     }
 
-    this.configService.disableTalkgroup(tgid);
+    this.settingsService.disableTalkgroup(tgid);
 
     this.callQueue = this.callQueue.filter(call => {
       if (call.talkgroup.id !== tgid) {
@@ -157,7 +142,7 @@ export class AppComponent implements OnInit{
       return
     }
 
-    this.configService.enableTalkgroup(tgid);
+    this.settingsService.enableTalkgroup(tgid);
   }
 
   skip(id: string | undefined) {

@@ -31,9 +31,7 @@ type application struct {
 	//quit              chan struct{}
 	metricsPort       string
 	serviceHTTPPort   string
-	serviceGRPCPort   string
 	permissiveHeaders bool
-	baseURL           string
 	counters          map[string]prometheus.Counter
 	SendChan          chan<- websocket.SendTo
 }
@@ -48,11 +46,9 @@ func main() {
 	}
 
 	app := application{
-		permissiveHeaders: mySettings.GetBool("permissive_headers"),
-		metricsPort:       mySettings.GetString("metrics_port"),
-		serviceHTTPPort:   mySettings.GetString("service_http_port"),
-		serviceGRPCPort:   mySettings.GetString("service_grpc_port"),
-		baseURL:           mySettings.GetString("base_url"),
+		permissiveHeaders: mySettings.GetBool("server.permissive_headers"),
+		metricsPort:       mySettings.GetString("server.metrics_port"),
+		serviceHTTPPort:   mySettings.GetString("server.service_http_port"),
 		counters:          make(map[string]prometheus.Counter),
 	}
 
@@ -92,7 +88,15 @@ func (app *application) run(ctx context.Context) error {
 	app.startMetrics(metricsListener)
 
 	// ctx, cancel := context.WithCancel(context.Background())
-	// defer cancel()
+
+	// Create audio directory if it does not exist
+	if _, err := os.Stat("audio"); os.IsNotExist(err) {
+		err = os.Mkdir("audio", 0755)
+
+		if err != nil {
+			app.logger.Errorf("Could not create audio directory: %v", err)
+		}
+	}
 
 	for {
 
@@ -103,7 +107,7 @@ func (app *application) run(ctx context.Context) error {
 
 		app.SendChan = hub.Send
 
-		httpService := httpservice.NewResponderService(app.baseURL, app.permissiveHeaders, app.logger, app.counters)
+		httpService := httpservice.NewHttpService(app.permissiveHeaders, app.logger, app.counters)
 
 		httpService.SendChan = app.SendChan
 
@@ -184,7 +188,7 @@ func (app *application) setupLogging() {
 		encoderConfig.EncodeTime = zapcore.ISO8601TimeEncoder
 		encoderConfig.EncodeLevel = zapcore.CapitalLevelEncoder
 
-		if viper.GetBool("console_logs") {
+		if viper.GetBool("server.console_logs") {
 			return zapcore.NewConsoleEncoder(encoderConfig)
 		}
 

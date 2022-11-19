@@ -1,4 +1,4 @@
-# Her Web Scanner
+# Hero Web Scanner
 
 *Hero Web Scanner* is a client/server application for controlling the audio received from an sdr-based scanning application and playing it in a browser.
 

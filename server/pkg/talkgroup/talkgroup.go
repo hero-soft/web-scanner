@@ -27,7 +27,7 @@ type record struct { // Our example struct, you can use "-" to ignore a field
 }
 
 func GetAll() ([]*Talkgroup, error) {
-	talkgroupsFile, err := os.OpenFile(viper.GetString("talkgroups_file"), os.O_RDWR|os.O_CREATE, os.ModePerm)
+	talkgroupsFile, err := os.OpenFile(viper.GetString("server.talkgroups_file"), os.O_RDWR|os.O_CREATE, os.ModePerm)
 	if err != nil {
 		return nil, fmt.Errorf("could not open talkgroups file: %v", err)
 	}
@@ -54,22 +54,23 @@ func GetAll() ([]*Talkgroup, error) {
 
 }
 
-func Lookup(talkgroupID string, fallback string) (*Talkgroup, error) {
-	talkgroupsFile, err := os.OpenFile(viper.GetString("talkgroups_file"), os.O_RDWR|os.O_CREATE, os.ModePerm)
+func Lookup(talkgroupID string, fallbackName string, fallbackDescription string) (Talkgroup, error) {
+	talkgroupsFile, err := os.OpenFile(viper.GetString("server.talkgroups_file"), os.O_RDWR|os.O_CREATE, os.ModePerm)
 	if err != nil {
-		return nil, fmt.Errorf("could not open talkgroups file: %v", err)
+		return Talkgroup{ID: talkgroupID, Name: fallbackName, Description: fallbackDescription}, fmt.Errorf("could not open talkgroups file: %v", err)
 	}
 	defer talkgroupsFile.Close()
 
 	talkgroups := []*record{}
 
 	if err := gocsv.UnmarshalFile(talkgroupsFile, &talkgroups); err != nil { // Load clients from file
-		return nil, fmt.Errorf("could not unmarshal talkgroups file: %v", err)
+		return Talkgroup{ID: talkgroupID, Name: fallbackName, Description: fallbackDescription}, fmt.Errorf("could not unmarshal talkgroups file: %v", err)
 	}
 
-	selectedTG := &Talkgroup{
-		ID:   talkgroupID,
-		Name: fallback,
+	selectedTG := Talkgroup{
+		ID:          talkgroupID,
+		Name:        fallbackName,
+		Description: fallbackDescription,
 	}
 
 	for _, tg := range talkgroups {

@@ -1,6 +1,7 @@
 <section class="buttons">
-  <button mat-stroked-button *ngFor="let tg of talkgroups" color="secondary">
+
+  <button *ngFor="let tg of talkgroups" (click)="changeState(tg.id, !tg.disabled)">
     <div class="text">{{ tg.name }}</div>
-    <div class="light"></div>
+    <div class="light" [ngClass]="{'green': !tg.disabled, 'red': tg.disabled}"></div>
   </button>
 </section>

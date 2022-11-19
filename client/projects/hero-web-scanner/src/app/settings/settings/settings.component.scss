@@ -1,0 +1,12 @@
+.config {
+  display: flex;
+  flex-direction: column;
+}
+
+mat-form-field {
+  width: 100%
+}
+
+mat-checkbox {
+  display: block;
+}

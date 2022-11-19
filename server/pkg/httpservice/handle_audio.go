@@ -1,7 +1,6 @@
 package httpservice
 
 import (
-	"fmt"
 	"io"
 	"net/http"
 	"os"
@@ -19,39 +18,40 @@ func (h HttpService) audio(w http.ResponseWriter, r *http.Request) {
 
 	//http.Redirect(w, r, "/app", 301)
 
-	// b, err := io.ReadAll(r.Body)
-	// if err != nil {
-	// 	log.Fatalln(err)
-	// }
-
 	r.ParseMultipartForm(6000000)
 
-	f, header, _ := r.FormFile("call")
+	f, header, err := r.FormFile("call")
 
-	// fmt.Printf("%v\n", r.MultipartForm.Value["api_key"])
-
-	// fmt.Println(string(b))
+	if err != nil {
+		h.logger.Errorf("Error getting file from form: %v", err)
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
 
 	filename := filepath.Join("audio", header.Filename)
 
 	if _, err := os.Stat(filename); err == nil {
 		// this prevents duplicate files
+		h.logger.Debugf("File %s already exists", filename)
 		return
 	}
 
-	// fmt.Println(filename)
+	fileWriter, err := os.OpenFile(filename, os.O_CREATE|os.O_WRONLY, 0666)
 
-	fileWriter, _ := os.OpenFile(filename, os.O_CREATE|os.O_WRONLY, 0666)
+	if err != nil {
+		h.logger.Errorf("Error opening file: %v", err)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
 
 	io.Copy(fileWriter, f)
 
 	talkgroupID := r.FormValue("talkgroup_num")
 
-	tg, err := talkgroup.Lookup(talkgroupID, "UNKNOWN")
+	tg, err := talkgroup.Lookup(talkgroupID, "", "UNKNOWN")
 
 	if err != nil {
-		fmt.Println("Error looking up talkgroup", err)
-		return
+		h.logger.Errorf("Error looking up talkgroup: %v", err)
 	}
 
 	h.SendChan <- websocket.SendTo{
@@ -60,7 +60,7 @@ func (h HttpService) audio(w http.ResponseWriter, r *http.Request) {
 			Type: "audio",
 			Call: call.Call{
 				ID:        uuid.NewV4().String(),
-				Talkgroup: *tg,
+				Talkgroup: tg,
 				File:      filename,
 			},
 		},

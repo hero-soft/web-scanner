@@ -1,6 +1,9 @@
+import { MatDialog } from '@angular/material/dialog';
 import { Injectable } from '@angular/core';
 import { BehaviorSubject } from 'rxjs';
 import { environment } from '../../environments/environment';
+import { AutoplayDialogComponent } from './autoplay-dialog/autoplay-dialog.component';
+import { SettingsService } from '../settings/settings.service';
 
 export interface Track {
   id: string;
@@ -15,13 +18,21 @@ export class PlayerService {
   private player = new Audio()
   private queue: Track[] = []
   private playing: Track | undefined = undefined
-  private baseURL = environment.serverURL
+  private baseURL = ""
   private enabled = true
+  private autoplayDialogShown = false
 
   public enabled$ = new BehaviorSubject<boolean>(this.enabled)
   public playing$: BehaviorSubject<Track | undefined> = new BehaviorSubject(this.playing)
 
-  constructor() {
+  constructor(
+    private dialog: MatDialog,
+    private settings: SettingsService
+  ) {
+    this.settings.settings$.subscribe(settings => {
+      this.baseURL = "http://" + settings.server.uri + "/"
+    })
+
     this.player.addEventListener('ended', () => {
       this.tryNext()
     });
@@ -117,7 +128,20 @@ export class PlayerService {
         this.playing$.next(this.playing)
 
         this.player.src = this.baseURL + next.file;
-        this.player.play();
+        this.player.play().catch((e) => {
+          if (e.name === "NotAllowedError") {
+            console.log("error playing audio", e);
+
+            if (!this.autoplayDialogShown) {
+              this.autoplayDialogShown = true
+              const dialog = this.dialog.open(AutoplayDialogComponent)
+
+              dialog.afterClosed().subscribe((result) => {
+                this.player.play()
+              })
+            }
+          }
+        });
       }
 
       return
