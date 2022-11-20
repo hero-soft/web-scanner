@@ -2,7 +2,6 @@ import { Component, OnInit } from '@angular/core';
 import { Call } from './call/call.type';
 import { SettingsService } from './settings/settings.service';
 import { PlayerService } from './player/player.service';
-// import { KnownTalkgroups, Talkgroup } from './talkgroup.type';
 import { ConnectionStatus, WebsocketService } from './websocket.service';
 
 @Component({
