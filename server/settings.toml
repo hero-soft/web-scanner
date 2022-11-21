@@ -1,11 +1,11 @@
 # Settings for the server
 [server]
     # The port that the server will listen on
-    service_http_port=8080
+    service_http_port=8900
     # The file the server will use to lookup talkgroup info
     # it will be checked each time a talkgroup is looked up
     # there is no need to restart the server when this file changes
-    talkgroups_file="trs_tg_736.csv"
+    talkgroups_file="talkgroups.csv"
     console_logs=true
 
 # Settings that will eb sent to the client as defaults
@@ -21,7 +21,7 @@
 
 [client.server]
     # This is where the client will attempt to connect
-    uri="localhost:8080"
+    uri="localhost:8900"
 
 
 
