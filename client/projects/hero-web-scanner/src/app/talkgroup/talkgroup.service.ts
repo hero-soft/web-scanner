@@ -34,7 +34,7 @@ export class TalkgroupService {
   }
 
   updateTalkgroups(base_uri: string){
-    this.http.get<Talkgroup[]>(base_uri + 'talkgroups').subscribe(talkgroups => {
+    this.http.get<Talkgroup[]>("http://" + base_uri + '/talkgroups').subscribe(talkgroups => {
 
       talkgroups.forEach(talkgroup => {
         talkgroup.disabled = !this.settingsService.checkTalkgroup(talkgroup.id)
