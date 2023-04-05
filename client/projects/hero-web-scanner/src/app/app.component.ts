@@ -13,6 +13,11 @@ export class AppComponent implements OnInit{
   title = 'HeroWebScanner';
   status: ConnectionStatus = ConnectionStatus.DISCONNECTED;
 
+  testCall: Call = {
+    id: "1",
+    talkgroup: {id: '1', name: 'Test', description: 'Test looooong description of talkgroup', disabled: false}
+  } as Call;
+
   constructor(
     private settingsService: SettingsService,
     private ws: WebsocketService,

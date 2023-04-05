@@ -1,7 +1,7 @@
 
 <div class="page">
   <mat-toolbar>
-    <span>Hero Web Scanner</span>
+    <span class="title">Hero Web Scanner</span>
     <div class="status"
     [ngClass]="{'connected': status === 'Connected',
                 'disconnected': status === 'Disconnected',
@@ -19,7 +19,7 @@
     </button>
   </mat-toolbar>
 
-  <mat-drawer-container autosize>
+  <mat-drawer-container>
     <mat-drawer #drawer mode="over" position="end">
       <app-config (close)="drawer.close()"></app-config>
 
@@ -49,9 +49,34 @@
     </div>
 
     <div class="content">
-      <div>
+      <div class="queue">
         <h2>Calls Queue ({{ callQueue.length }})</h2>
         <div  class="call-list">
+          <!-- <app-call
+            [call]="testCall"
+            [showAvoid]="true"
+            [showSkip]="true"
+          ></app-call>
+          <app-call
+            [call]="testCall"
+            [showAvoid]="true"
+            [showSkip]="true"
+          ></app-call>
+          <app-call
+            [call]="testCall"
+            [showAvoid]="true"
+            [showSkip]="true"
+          ></app-call>
+          <app-call
+            [call]="testCall"
+            [showAvoid]="true"
+            [showSkip]="true"
+          ></app-call>
+          <app-call
+            [call]="testCall"
+            [showAvoid]="true"
+            [showSkip]="true"
+          ></app-call> -->
           <app-call *ngFor="let call of callQueue"
             [call]="call"
             [showAvoid]="true"
@@ -62,9 +87,14 @@
         </div>
       </div>
 
-      <div>
+      <div class="active">
         <h2>Active Calls ({{ activeTGs.length }})</h2>
         <div  class="call-list">
+          <!-- <app-call
+            [call]="testCall"
+            [showAvoid]="true"
+            [showSkip]="true"
+          ></app-call> -->
           <app-call *ngFor="let call of activeTGs"
             [call]="call"
             [showSkip]="false"
@@ -74,9 +104,14 @@
         </div>
       </div>
 
-    <div>
+      <div class="history">
       <h2>History Calls ({{ historyQueue.length }})</h2>
       <div class="call-list">
+        <!-- <app-call
+            [call]="testCall"
+            [showAvoid]="true"
+            [showSkip]="true"
+          ></app-call> -->
         <app-call *ngFor="let call of historyQueue"
           [call]="call"
           [showAvoid]="true"

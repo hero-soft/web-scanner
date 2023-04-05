@@ -1,14 +1,19 @@
 .call {
   border: 1px solid #000;
   padding: 10px;
-  display: flex;
+  // display: flex;
   flex-direction: row;
 
   align-items: center;
 
+  max-width: 100%;
+
   .text {
+    max-width: 100%;
     text-overflow: ellipsis;
+    margin: 10px;
     white-space: nowrap;
+    overflow: hidden;
   }
 
   .spacer {

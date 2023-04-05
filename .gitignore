@@ -1,3 +1,4 @@
 .DS_Store
 dist/
 web-scanner-*.zip
+server/trs_tg_736.csv

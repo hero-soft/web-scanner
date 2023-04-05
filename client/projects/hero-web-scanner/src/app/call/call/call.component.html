@@ -1,5 +1,5 @@
 <div class="call" *ngIf="call">
-  <span class="text" [matTooltip]="call.talkgroup.id + ' | ' + call.talkgroup.description" >{{call.talkgroup.id}} | {{call.talkgroup.description}}</span>
+  <div class="text" [matTooltip]="call.talkgroup.id + ' | ' + call.talkgroup.description" >{{call.talkgroup.name}} | {{call.talkgroup.description}}({{call.talkgroup.id}})</div>
   <span class="spacer"></span>
   <span class="actions">
     <button mat-raised-button *ngIf="showAvoid && !disabled" (click)="avoid()">Avoid</button>

@@ -1,7 +1,7 @@
 {
   "id": 1,
   "server": {
-    "uri": "localhost:8080"
+    "uri": "localhost:8900"
   },
   "show_active_calls": true,
   "play_unknown_talkgroups": true,
